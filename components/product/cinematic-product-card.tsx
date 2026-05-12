@@ -1,28 +1,17 @@
 "use client";
 
 import Link from "next/link";
-
 import Image from "next/image";
 
-import {
-  motion,
-} from "framer-motion";
+import { motion } from "framer-motion";
 
-import {
-  ShoppingBag,
-} from "lucide-react";
-
-import ImageReveal from "@/components/common/image-reveal";
+import { ShoppingBag } from "lucide-react";
 
 interface CinematicProductCardProps {
   slug: string;
-
   name: string;
-
   price: number;
-
   image: string;
-
   category?: string;
 }
 
@@ -33,13 +22,11 @@ export default function CinematicProductCard({
   image,
   category,
 }: CinematicProductCardProps) {
-
   return (
     <Link
       href={`/shop/${slug}`}
       className="group block"
     >
-
       <motion.article
         whileHover={{
           y: -6,
@@ -50,40 +37,33 @@ export default function CinematicProductCard({
         }}
         className="relative"
       >
-
         {/* =========================================================
             IMAGE EXPERIENCE
         ========================================================== */}
         <div className="relative overflow-hidden rounded-[2rem] bg-[#0A0A0A]">
 
-          {/* Cinematic Reveal */}
-          <ImageReveal>
+          {/* Product Image */}
+          <div className="relative aspect-[4/5] overflow-hidden">
 
-            <div className="relative aspect-[4/5] overflow-hidden">
+            <motion.div
+              whileHover={{
+                scale: 1.04,
+              }}
+              transition={{
+                duration: 1.2,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="h-full w-full"
+            >
+              <Image
+                src={image}
+                alt={name}
+                fill
+                className="object-cover"
+              />
+            </motion.div>
 
-              <motion.div
-                whileHover={{
-                  scale: 1.04,
-                }}
-                transition={{
-                  duration: 1.2,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="h-full w-full"
-              >
-
-                <Image
-                  src={image}
-                  alt={name}
-                  fill
-                  className="object-cover"
-                />
-
-              </motion.div>
-
-            </div>
-
-          </ImageReveal>
+          </div>
 
           {/* Luxury Overlay */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
@@ -103,9 +83,7 @@ export default function CinematicProductCard({
             <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-xl">
 
               <span className="text-[10px] uppercase tracking-[0.24em] text-white/70">
-
                 {category}
-
               </span>
 
             </div>
@@ -121,9 +99,7 @@ export default function CinematicProductCard({
             }}
             className="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-xl transition duration-500 hover:border-[#D6C2A3]"
           >
-
             <ShoppingBag className="h-[16px] w-[16px] text-white/88" />
-
           </motion.button>
 
         </div>
@@ -135,24 +111,18 @@ export default function CinematicProductCard({
 
           {/* Product Name */}
           <h3 className="text-lg font-light tracking-[-0.02em] text-white transition duration-500 group-hover:text-[#D6C2A3]">
-
             {name}
-
           </h3>
 
           {/* Price */}
           <div className="mt-3 flex items-center justify-between">
 
             <p className="text-sm tracking-[0.18em] text-white/55">
-
               ₹{price.toLocaleString()}
-
             </p>
 
             <span className="text-[10px] uppercase tracking-[0.24em] text-white/40 transition duration-500 group-hover:text-white/70">
-
               View Piece
-
             </span>
 
           </div>
@@ -160,7 +130,6 @@ export default function CinematicProductCard({
         </div>
 
       </motion.article>
-
     </Link>
   );
 }
