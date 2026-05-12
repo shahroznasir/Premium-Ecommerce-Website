@@ -1,65 +1,50 @@
 "use client";
 
-import { ReactNode } from "react";
-
 import {
   motion,
   useReducedMotion,
 } from "framer-motion";
 
+import {
+  ReactNode,
+} from "react";
+
 import { MOTION } from "@/lib/motion";
 
-interface RevealProps {
+interface ScrollNarrativeProps {
   children: ReactNode;
 
+  className?: string;
+
   delay?: number;
-  duration?: number;
-
-  y?: number;
-
-  blur?: boolean;
 
   once?: boolean;
-
-  className?: string;
 }
 
-export default function Reveal({
+export default function ScrollNarrative({
   children,
-
-  delay = 0,
-
-  duration =
-    MOTION.duration.cinematic,
-
-  y = 40,
-
-  blur = false,
-
-  once = true,
-
   className,
-}: RevealProps) {
+  delay = 0,
+  once = true,
+}: ScrollNarrativeProps) {
 
   const prefersReducedMotion =
     useReducedMotion();
 
   return (
     <motion.div
-      className={className}
       initial={{
         opacity: 0,
 
         y:
           prefersReducedMotion
             ? 0
-            : y,
+            : 50,
 
         filter:
-          blur &&
-          !prefersReducedMotion
-            ? "blur(8px)"
-            : "blur(0px)",
+          prefersReducedMotion
+            ? "blur(0px)"
+            : "blur(6px)",
       }}
       whileInView={{
         opacity: 1,
@@ -68,19 +53,20 @@ export default function Reveal({
       }}
       viewport={{
         once,
-        amount: 0.12,
+        amount: 0.15,
       }}
       transition={{
         duration:
           prefersReducedMotion
-            ? 0.3
-            : duration,
+            ? 0.35
+            : MOTION.duration.cinematic,
 
         delay,
 
         ease:
           MOTION.ease.luxury,
       }}
+      className={className}
       style={{
         willChange:
           "transform, opacity",

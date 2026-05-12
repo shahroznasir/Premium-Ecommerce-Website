@@ -1,6 +1,11 @@
 import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 
-import Reveal from "@/components/common/reveal";
+import Section from "@/components/layout/section";
+import Atmosphere from "@/components/layout/atmosphere";
+import Scene from "@/components/layout/scene";
+
+import { MOTION } from "@/lib/motion";
 
 import Hero from "@/sections/home/hero";
 import Editorial from "@/sections/home/editorial";
@@ -15,147 +20,185 @@ import SignaturePiece from "@/sections/home/signature-piece";
 import QuoteDivider from "@/sections/home/quote-divider";
 import Products from "@/sections/home/products";
 
-import Footer from "@/components/layout/footer";
-
 export default function Home() {
   return (
     <main className="relative overflow-x-hidden bg-[#050505] text-white">
 
-      {/* ================= GLOBAL ATMOSPHERE ================= */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      {/* =========================================================
+          GLOBAL ATMOSPHERE
+      ========================================================== */}
+      <Atmosphere />
 
-        {/* Main Aura */}
-        <div className="absolute left-1/2 top-[-20%] h-[1300px] w-[1300px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.03] blur-[240px]" />
-
-        {/* Left Ambient */}
-        <div className="absolute left-[-15%] top-[25%] h-[700px] w-[700px] rounded-full bg-[#B89B72]/[0.02] blur-[180px]" />
-
-        {/* Right Ambient */}
-        <div className="absolute right-[-10%] top-[65%] h-[900px] w-[900px] rounded-full bg-[#B89B72]/[0.018] blur-[220px]" />
-
-        {/* Bottom Glow */}
-        <div className="absolute bottom-[-20%] left-1/2 h-[900px] w-[900px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.018] blur-[240px]" />
-
-        {/* Grain */}
-        <div
-          className="absolute inset-0 opacity-[0.012] mix-blend-soft-light"
-          style={{
-            backgroundImage:
-              "url('https://grainy-gradients.vercel.app/noise.svg')",
-          }}
-        />
-
-      </div>
-
-      {/* ================= CINEMATIC VIGNETTE ================= */}
-      <div className="pointer-events-none fixed inset-0 z-[1]">
-
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,155,114,0.04),transparent_38%)]" />
-
-        <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.68)]" />
-
-      </div>
-
-      {/* ================= NAVBAR ================= */}
+      {/* =========================================================
+          NAVIGATION
+      ========================================================== */}
       <Navbar />
 
-      {/* ================= HERO ================= */}
-      <section className="relative z-10 overflow-hidden">
-        <Hero />
-      </section>
+      {/* =========================================================
+          HERO EXPERIENCE
+      ========================================================== */}
+      <Scene intensity={0.6}>
+        <Section>
+          <Hero />
+        </Section>
+      </Scene>
 
-      {/* ================= EDITORIAL ================= */}
-      <Reveal>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          EDITORIAL STORY
+      ========================================================== */}
+      <Scene intensity={0.35}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.none}
+        >
           <Editorial />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= IMMERSIVE ================= */}
-      <Reveal delay={0.08}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          IMMERSIVE EXPERIENCE
+      ========================================================== */}
+      <Scene intensity={0.45}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.sm}
+        >
           <Immersive />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= EDITORIAL TRANSITION ================= */}
-      <Reveal delay={0.1}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
-          <EditorialTransition />
-        </section>
-      </Reveal>
+      {/* =========================================================
+          TRANSITIONAL NARRATIVE
+      ========================================================== */}
+      <Section
+        reveal
+        bordered
+        delay={MOTION.delay.md}
+      >
+        <EditorialTransition />
+      </Section>
 
-      {/* ================= MARQUEE ================= */}
-      <Reveal delay={0.05}>
-        <section className="relative z-10 overflow-hidden border-y border-white/[0.04] py-10">
-          <Marquee />
-        </section>
-      </Reveal>
+      {/* =========================================================
+          LUXURY MARQUEE
+      ========================================================== */}
+      <Section
+        reveal
+        delay={MOTION.delay.xs}
+        className="border-y border-white/[0.04] py-10"
+      >
+        <Marquee />
+      </Section>
 
-      {/* ================= COLLECTIONS ================= */}
-      <Reveal delay={0.08}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          COLLECTIONS
+      ========================================================== */}
+      <Scene intensity={0.25}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.sm}
+        >
           <Collections />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= PARALLAX ================= */}
-      <Reveal delay={0.08}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          PARALLAX EXPERIENCE
+      ========================================================== */}
+      <Scene intensity={0.3}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.sm}
+        >
           <ParallaxSection />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= SHOWCASE ================= */}
-      <Reveal delay={0.08}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          CURATED SHOWCASE
+      ========================================================== */}
+      <Scene intensity={0.4}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.sm}
+        >
           <Showcase />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= HORIZONTAL STORY ================= */}
-      <Reveal delay={0.1}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          HORIZONTAL STORYTELLING
+      ========================================================== */}
+      <Scene intensity={0.45}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.md}
+        >
           <HorizontalScroll />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= SIGNATURE ================= */}
-      <Reveal delay={0.08}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          SIGNATURE PIECE
+      ========================================================== */}
+      <Scene intensity={0.35}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.sm}
+        >
           <SignaturePiece />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= QUOTE ================= */}
-      <Reveal delay={0.05}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
-          <QuoteDivider />
-        </section>
-      </Reveal>
+      {/* =========================================================
+          QUOTATION DIVIDER
+      ========================================================== */}
+      <Section
+        reveal
+        bordered
+        delay={MOTION.delay.xs}
+      >
+        <QuoteDivider />
+      </Section>
 
-      {/* ================= PRODUCTS ================= */}
-      <Reveal delay={0.08}>
-        <section className="relative z-10 overflow-hidden border-t border-white/[0.04]">
+      {/* =========================================================
+          FEATURED PRODUCTS
+      ========================================================== */}
+      <Scene intensity={0.2}>
+        <Section
+          reveal
+          bordered
+          delay={MOTION.delay.sm}
+        >
           <Products />
-        </section>
-      </Reveal>
+        </Section>
+      </Scene>
 
-      {/* ================= FOOTER TRANSITION ================= */}
+      {/* =========================================================
+          FOOTER ATMOSPHERIC TRANSITION
+      ========================================================== */}
       <div className="relative z-10 h-24 overflow-hidden">
 
         {/* Soft Fade */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#070707]/50 to-black" />
 
         {/* Ambient Glow */}
-        <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B89B72]/[0.03] blur-[180px]" />
+        <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B89B72]/[0.03] blur-[180px]" />
 
       </div>
 
-      {/* ================= FOOTER ================= */}
-      <Reveal>
+      {/* =========================================================
+          FOOTER
+      ========================================================== */}
+      <Section reveal>
         <Footer />
-      </Reveal>
+      </Section>
 
     </main>
   );

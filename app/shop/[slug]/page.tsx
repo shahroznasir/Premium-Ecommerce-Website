@@ -8,6 +8,11 @@ import RelatedProducts from "@/components/product/related-products";
 import RecentlyViewed from "@/components/product/recently-viewed";
 import TrackProduct from "@/components/product/track-product";
 import ProductActions from "@/components/product/product-actions";
+import ProductAtmosphere from "@/components/product/product-atmosphere";
+
+import ScrollNarrative from "@/components/common/scroll-narrative";
+import CinematicHeading from "@/components/common/cinematic-heading";
+import SpatialDepth from "@/components/common/spatial-depth";
 
 import { supabase } from "@/lib/supabase";
 
@@ -18,6 +23,7 @@ interface ProductPageProps {
 }
 
 async function getProduct(slug: string) {
+
   const { data } = await supabase
     .from("products")
     .select("*")
@@ -30,6 +36,7 @@ async function getProduct(slug: string) {
 async function getRelatedProducts(
   category: string
 ) {
+
   const { data } = await supabase
     .from("products")
     .select("*")
@@ -42,9 +49,11 @@ async function getRelatedProducts(
 export default async function ProductPage({
   params,
 }: ProductPageProps) {
+
   const { slug } = await params;
 
-  const product = await getProduct(slug);
+  const product =
+    await getProduct(slug);
 
   if (!product) {
     notFound();
@@ -61,7 +70,9 @@ export default async function ProductPage({
 
       <main className="relative overflow-hidden bg-[#050505] text-white">
 
-        {/* ================= TRACK ================= */}
+        {/* =========================================================
+            TRACK
+        ========================================================== */}
         <TrackProduct
           product={{
             id: product.id,
@@ -73,143 +84,192 @@ export default async function ProductPage({
           }}
         />
 
-        {/* ================= ATMOSPHERE ================= */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        {/* =========================================================
+            DYNAMIC ATMOSPHERE
+        ========================================================== */}
+        <ProductAtmosphere
+          category={product.category}
+          title={product.title}
+        />
 
-          <div className="absolute left-1/2 top-[-20%] h-[1000px] w-[1000px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.04] blur-[180px]" />
-
-          <div className="absolute right-[-10%] top-[30%] h-[600px] w-[600px] rounded-full bg-[#B89B72]/[0.03] blur-[160px]" />
-
-        </div>
-
-        {/* ================= HERO ================= */}
-        <section className="relative overflow-hidden pt-32">
+        {/* =========================================================
+            HERO
+        ========================================================== */}
+        <section className="relative overflow-hidden pt-24 md:pt-32">
 
           <div className="container-luxury relative z-10">
 
-            <div className="grid items-start gap-16 xl:grid-cols-[1fr_0.85fr]">
+            <div className="grid items-start gap-12 md:gap-16 xl:grid-cols-[1fr_0.85fr]">
 
-              {/* ================= LEFT ================= */}
-              <div>
+              {/* =========================================================
+                  GALLERY
+              ========================================================== */}
+              <ScrollNarrative>
 
-                <div className="relative overflow-hidden rounded-[2.8rem] border border-white/[0.06] bg-white/[0.02]">
+                <SpatialDepth intensity={10}>
 
-                  {/* Reflection */}
-                  <div className="pointer-events-none absolute inset-y-0 left-[-20%] z-20 w-[20%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent blur-3xl" />
+                  <div className="relative overflow-hidden rounded-[2rem] md:rounded-[2.8rem] border border-white/[0.06] bg-white/[0.02]">
 
-                  {/* Gallery */}
-                  <div className="relative z-10">
+                    {/* Reflection */}
+                    <div className="pointer-events-none absolute inset-y-0 left-[-20%] z-20 hidden w-[20%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent blur-3xl md:block" />
 
-                    <CinematicGallery
-                      images={[
-                        product.image,
-                        product.image,
-                        product.image,
-                        product.image,
-                      ]}
-                    />
+                    {/* Ambient Glow */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,155,114,0.08),transparent_40%)] opacity-70" />
+
+                    {/* Gallery */}
+                    <div className="relative z-10">
+
+                      <CinematicGallery
+                        images={[
+                          product.image,
+                          product.image,
+                          product.image,
+                          product.image,
+                        ]}
+                      />
+
+                    </div>
+
+                    {/* Vignette */}
+                    <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] md:shadow-[inset_0_0_140px_rgba(0,0,0,0.42)]" />
 
                   </div>
 
-                </div>
+                </SpatialDepth>
 
-              </div>
+              </ScrollNarrative>
 
-              {/* ================= RIGHT ================= */}
-              <div className="sticky top-28">
+              {/* =========================================================
+                  PRODUCT STORY
+              ========================================================== */}
+              <div className="xl:sticky xl:top-28">
 
                 {/* Category */}
-                <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/70">
+                <ScrollNarrative delay={0.05}>
 
-                  {product.category}
+                  <p className="text-[9px] md:text-[10px] uppercase tracking-[0.42em] md:tracking-[0.48em] text-[#B89B72]/70">
 
-                </p>
-
-                {/* Title */}
-                <h1 className="mt-8 max-w-[10ch] text-[4.5rem] font-light leading-[0.88] tracking-[-0.08em] text-white xl:text-[5.5rem]">
-
-                  {product.title}
-
-                </h1>
-
-                {/* Divider */}
-                <div className="mt-10 h-px w-20 bg-[#B89B72]/70" />
-
-                {/* Description */}
-                <p className="mt-10 max-w-[520px] text-[1.02rem] leading-[2] text-white/52">
-
-                  {product.description}
-
-                </p>
-
-                {/* Price */}
-                <div className="mt-14">
-
-                  <p className="text-[2.7rem] font-light tracking-[-0.06em] text-white">
-
-                    ₹
-                    {product.price.toLocaleString(
-                      "en-IN"
-                    )}
+                    {product.category}
 
                   </p>
 
-                </div>
+                </ScrollNarrative>
+
+                {/* Title */}
+                <ScrollNarrative delay={0.1}>
+
+                  <CinematicHeading
+                    className="mt-6 md:mt-8 max-w-[10ch] text-[3rem] leading-[0.88] tracking-[-0.08em] text-white md:text-[4.5rem] xl:text-[5.5rem] font-light"
+                  >
+
+                    {product.title}
+
+                  </CinematicHeading>
+
+                </ScrollNarrative>
+
+                {/* Divider */}
+                <ScrollNarrative delay={0.15}>
+
+                  <div className="mt-8 md:mt-10 h-px w-16 md:w-20 bg-gradient-to-r from-[#B89B72] to-transparent" />
+
+                </ScrollNarrative>
+
+                {/* Description */}
+                <ScrollNarrative delay={0.2}>
+
+                  <p className="mt-8 md:mt-10 max-w-[520px] text-[0.98rem] md:text-[1.02rem] leading-[1.95] md:leading-[2] text-white/50">
+
+                    {product.description}
+
+                  </p>
+
+                </ScrollNarrative>
+
+                {/* Price */}
+                <ScrollNarrative delay={0.25}>
+
+                  <div className="mt-10 md:mt-14">
+
+                    <p className="text-[2.2rem] md:text-[2.7rem] font-light tracking-[-0.06em] text-white">
+
+                      ₹
+                      {product.price.toLocaleString(
+                        "en-IN"
+                      )}
+
+                    </p>
+
+                  </div>
+
+                </ScrollNarrative>
 
                 {/* Actions */}
-                <div className="mt-14">
+                <ScrollNarrative delay={0.3}>
 
-                  <ProductActions
-                    product={{
-                      id: product.id,
-                      title: product.title,
-                      slug: product.slug,
-                      image: product.image,
-                      price: product.price,
-                    }}
-                  />
+                  <div className="mt-10 md:mt-14">
 
-                </div>
-
-                {/* Specs */}
-                <div className="mt-20 border-t border-white/[0.06] pt-10">
-
-                  <div className="grid gap-y-10 sm:grid-cols-2">
-
-                    <LuxurySpec
-                      label="Material"
-                      value="Premium Sculptural Resin"
-                    />
-
-                    <LuxurySpec
-                      label="Finish"
-                      value="Architectural Matte"
-                    />
-
-                    <LuxurySpec
-                      label="Dimensions"
-                      value="42 × 28 × 18 cm"
-                    />
-
-                    <LuxurySpec
-                      label="Craftsmanship"
-                      value="Hand Finished"
+                    <ProductActions
+                      product={{
+                        id: product.id,
+                        title: product.title,
+                        slug: product.slug,
+                        image: product.image,
+                        price: product.price,
+                      }}
                     />
 
                   </div>
 
-                </div>
+                </ScrollNarrative>
+
+                {/* Specs */}
+                <ScrollNarrative delay={0.35}>
+
+                  <div className="mt-14 md:mt-20 border-t border-white/[0.06] pt-8 md:pt-10">
+
+                    <div className="grid gap-y-8 md:gap-y-10 sm:grid-cols-2">
+
+                      <LuxurySpec
+                        label="Material"
+                        value="Premium Sculptural Resin"
+                      />
+
+                      <LuxurySpec
+                        label="Finish"
+                        value="Architectural Matte"
+                      />
+
+                      <LuxurySpec
+                        label="Dimensions"
+                        value="42 × 28 × 18 cm"
+                      />
+
+                      <LuxurySpec
+                        label="Craftsmanship"
+                        value="Hand Finished"
+                      />
+
+                    </div>
+
+                  </div>
+
+                </ScrollNarrative>
 
                 {/* Pills */}
-                <div className="mt-14 flex flex-wrap gap-3">
+                <ScrollNarrative delay={0.4}>
 
-                  <LuxuryPill text="White Glove Delivery" />
+                  <div className="mt-10 md:mt-14 flex flex-wrap gap-3">
 
-                  <LuxuryPill text="Limited Edition" />
+                    <LuxuryPill text="White Glove Delivery" />
 
-                  <LuxuryPill text="Curated Luxury Object" />
+                    <LuxuryPill text="Limited Edition" />
 
-                </div>
+                    <LuxuryPill text="Curated Luxury Object" />
+
+                  </div>
+
+                </ScrollNarrative>
 
               </div>
 
@@ -219,55 +279,71 @@ export default async function ProductPage({
 
         </section>
 
-        {/* ================= EDITORIAL ================= */}
-        <section className="relative py-32">
+        {/* =========================================================
+            EDITORIAL STORY
+        ========================================================== */}
+        <section className="relative py-24 md:py-36">
 
           <div className="container-luxury">
 
-            <div className="grid items-start gap-20 lg:grid-cols-2">
+            <div className="grid items-start gap-12 md:gap-20 lg:grid-cols-2">
 
               {/* Left */}
               <div>
 
-                <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/70">
+                <ScrollNarrative>
 
-                  Crafted Presence
+                  <p className="text-[9px] md:text-[10px] uppercase tracking-[0.42em] md:tracking-[0.48em] text-[#B89B72]/70">
 
-                </p>
+                    Crafted Presence
 
-                <h2 className="mt-8 text-5xl font-light leading-[0.92] tracking-[-0.08em] text-white md:text-6xl">
+                  </p>
 
-                  Designed
-                  <br />
-                  Through
-                  <br />
-                  Timeless
-                  <br />
-                  Materiality
+                </ScrollNarrative>
 
-                </h2>
+                <ScrollNarrative delay={0.1}>
+
+                  <CinematicHeading
+                    className="mt-6 md:mt-8 text-4xl md:text-5xl font-light leading-[0.9] tracking-[-0.08em] text-white lg:text-6xl"
+                  >
+
+                    Designed
+                    <br />
+                    Through
+                    <br />
+                    Timeless
+                    <br />
+                    Materiality
+
+                  </CinematicHeading>
+
+                </ScrollNarrative>
 
               </div>
 
               {/* Right */}
               <div>
 
-                <p className="max-w-[560px] text-[1.05rem] leading-[2.1] text-white/52">
+                <ScrollNarrative delay={0.2}>
 
-                  Every sculptural detail is designed
-                  through balance, restraint,
-                  proportion, and atmospheric
-                  composition.
+                  <p className="max-w-[560px] text-[1rem] md:text-[1.05rem] leading-[2] md:leading-[2.1] text-white/50">
 
-                  <br />
-                  <br />
+                    Every sculptural detail is designed
+                    through balance, restraint,
+                    proportion, and atmospheric
+                    composition.
 
-                  The collection represents cinematic
-                  luxury through silence,
-                  craftsmanship, and timeless modern
-                  presence.
+                    <br />
+                    <br />
 
-                </p>
+                    The collection represents cinematic
+                    luxury through silence,
+                    craftsmanship, and timeless modern
+                    presence.
+
+                  </p>
+
+                </ScrollNarrative>
 
               </div>
 
@@ -277,59 +353,93 @@ export default async function ProductPage({
 
         </section>
 
-        {/* ================= FEATURE IMAGE ================= */}
-        <section className="relative py-24">
+        {/* =========================================================
+            MONUMENTAL IMAGE
+        ========================================================== */}
+        <section className="relative py-20 md:py-24">
 
           <div className="container-luxury">
 
-            <div className="relative overflow-hidden rounded-[3rem] border border-white/[0.06]">
+            <ScrollNarrative>
 
-              <img
-                src={product.image}
-                alt={product.title}
-                className="h-[85vh] w-full object-cover"
-              />
+              <SpatialDepth intensity={8}>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+                <div className="group relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-white/[0.06]">
 
-              <div className="absolute bottom-0 left-0 p-10 md:p-16">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="h-[60vh] md:h-[85vh] w-full object-cover transition-transform duration-[4000ms] ease-out group-hover:scale-[1.03]"
+                  />
 
-                <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                  Architectural Presence
+                  {/* Vignette */}
+                  <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] md:shadow-[inset_0_0_140px_rgba(0,0,0,0.42)]" />
 
-                </p>
+                  {/* Ambient Glow */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,155,114,0.08),transparent_45%)] opacity-70" />
 
-                <h2 className="mt-6 text-5xl font-light leading-[0.9] tracking-[-0.08em] text-white md:text-6xl">
+                  {/* Content */}
+                  <div className="absolute bottom-0 left-0 p-8 md:p-16">
 
-                  Designed
-                  <br />
-                  Through
-                  <br />
-                  Silence
+                    <ScrollNarrative delay={0.1}>
 
-                </h2>
+                      <p className="text-[9px] md:text-[10px] uppercase tracking-[0.42em] md:tracking-[0.48em] text-[#B89B72]/80">
 
-              </div>
+                        Architectural Presence
 
-            </div>
+                      </p>
+
+                    </ScrollNarrative>
+
+                    <ScrollNarrative delay={0.2}>
+
+                      <CinematicHeading
+                        className="mt-5 md:mt-6 text-4xl md:text-5xl font-light leading-[0.88] tracking-[-0.08em] text-white lg:text-6xl"
+                      >
+
+                        Designed
+                        <br />
+                        Through
+                        <br />
+                        Silence
+
+                      </CinematicHeading>
+
+                    </ScrollNarrative>
+
+                  </div>
+
+                </div>
+
+              </SpatialDepth>
+
+            </ScrollNarrative>
 
           </div>
 
         </section>
 
-        {/* ================= RELATED ================= */}
+        {/* =========================================================
+            RELATED PRODUCTS
+        ========================================================== */}
         <RelatedProducts
           products={relatedProducts.filter(
             (item) => item.id !== product.id
           )}
         />
 
-        {/* ================= RECENTLY VIEWED ================= */}
+        {/* =========================================================
+            RECENTLY VIEWED
+        ========================================================== */}
         <RecentlyViewed />
 
-        {/* ================= SPACING ================= */}
-        <div className="h-24" />
+        {/* =========================================================
+            SPACING
+        ========================================================== */}
+        <div className="h-16 md:h-24" />
 
       </main>
 
@@ -348,13 +458,13 @@ function LuxurySpec({
   return (
     <div>
 
-      <p className="text-[10px] uppercase tracking-[0.35em] text-white/30">
+      <p className="text-[9px] md:text-[10px] uppercase tracking-[0.32em] md:tracking-[0.35em] text-white/30">
 
         {label}
 
       </p>
 
-      <p className="mt-3 text-lg text-white/78">
+      <p className="mt-2 md:mt-3 text-base md:text-lg text-white/78">
 
         {value}
 
@@ -370,7 +480,7 @@ function LuxuryPill({
   text: string;
 }) {
   return (
-    <div className="rounded-full border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-[10px] uppercase tracking-[0.35em] text-white/55 backdrop-blur-xl">
+    <div className="rounded-full border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 md:px-5 md:py-3 text-[9px] md:text-[10px] uppercase tracking-[0.32em] md:tracking-[0.35em] text-white/55 backdrop-blur-xl transition-all duration-500 hover:border-[#B89B72]/30 hover:bg-white/[0.05]">
 
       {text}
 
