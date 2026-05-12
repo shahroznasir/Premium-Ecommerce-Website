@@ -18,7 +18,6 @@ export default function SmoothScrollProvider({
       duration: 1.4,
 
       smoothWheel: true,
-      smoothTouch: false,
 
       touchMultiplier: 1.5,
 
