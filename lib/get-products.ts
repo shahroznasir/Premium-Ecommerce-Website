@@ -1,15 +1,42 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getProducts() {
-  const { data, error } =
+
+  const {
+    data,
+    error,
+  } =
     await supabase
       .from("products")
       .select("*");
 
   if (error) {
+
     console.error(error);
+
     return [];
   }
 
-  return data || [];
+  /* =========================================
+     CLEAN IMAGE URLS
+  ========================================== */
+
+  return (
+    data?.map(
+      (product) => ({
+        ...product,
+
+        image:
+          product.image?.trim(),
+
+        images:
+          product.images?.map(
+            (
+              img: string
+            ) =>
+              img.trim()
+          ) || [],
+      })
+    ) || []
+  );
 }

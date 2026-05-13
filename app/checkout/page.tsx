@@ -1,64 +1,252 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
+import Script from "next/script";
+
+import { useCartStore } from "@/stores/cart-store";
+
+/* =========================================================
+   RAZORPAY TYPES
+========================================================== */
+
+declare global {
+  interface Window {
+    Razorpay: new (
+      options: RazorpayOptions
+    ) => {
+      open: () => void;
+    };
+  }
+}
+
+type RazorpayResponse = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayOptions = {
+  key: string | undefined;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+
+  handler: (
+    response: RazorpayResponse
+  ) => Promise<void>;
+
+  prefill: {
+    name: string;
+    email: string;
+    contact: string;
+  };
+
+  theme: {
+    color: string;
+  };
+};
 
 export default function CheckoutPage() {
+
+  const items =
+    useCartStore(
+      (state) => state.items
+    );
+
+  const clearCart =
+    useCartStore(
+      (state) => state.clearCart
+    );
+
+  const total =
+    items.reduce(
+      (acc, item) =>
+        acc +
+        item.price *
+          item.quantity,
+      0
+    );
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [customer, setCustomer] =
+    useState({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      postalCode: "",
+    });
+
+  /* =========================================================
+     HANDLE PAYMENT
+  ========================================================== */
+
+  async function handlePayment() {
+
+    try {
+
+      setLoading(true);
+
+      /* =====================================================
+         CREATE ORDER
+      ====================================================== */
+
+      const orderRes =
+        await fetch(
+          "/api/create-order",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              amount: total,
+            }),
+          }
+        );
+
+      const orderData =
+        await orderRes.json();
+
+      /* =====================================================
+         RAZORPAY OPTIONS
+      ====================================================== */
+
+      const options: RazorpayOptions = {
+        key:
+          process.env
+            .NEXT_PUBLIC_RAZORPAY_KEY_ID,
+
+        amount:
+          orderData.amount,
+
+        currency: "INR",
+
+        name:
+          "The Decor Art Studio",
+
+        description:
+          "Luxury Collection Purchase",
+
+        order_id:
+          orderData.id,
+
+        handler:
+          async function (
+            response: RazorpayResponse
+          ) {
+
+            await fetch(
+              "/api/verify-payment",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+
+                body: JSON.stringify(
+                  {
+                    razorpay_order_id:
+                      response.razorpay_order_id,
+
+                    razorpay_payment_id:
+                      response.razorpay_payment_id,
+
+                    razorpay_signature:
+                      response.razorpay_signature,
+
+                    items,
+
+                    total,
+
+                    customer,
+                  }
+                ),
+              }
+            );
+
+            clearCart();
+
+            window.location.href =
+              "/checkout/success";
+          },
+
+        prefill: {
+          name:
+            customer.name,
+
+          email:
+            customer.email,
+
+          contact:
+            customer.phone,
+        },
+
+        theme: {
+          color:
+            "#B89B72",
+        },
+      };
+
+      /* =====================================================
+         OPEN RAZORPAY
+      ====================================================== */
+
+      const razorpay =
+        new window.Razorpay(
+          options
+        );
+
+      razorpay.open();
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoading(false);
+    }
+  }
+
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
+    <>
+      {/* =====================================================
+          RAZORPAY SCRIPT
+      ====================================================== */}
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
-      {/* ================= ATMOSPHERE ================= */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <main className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
 
-        {/* Main Glow */}
-        <div className="absolute left-1/2 top-[-15%] h-[1200px] w-[1200px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.04] blur-[220px]" />
+        {/* =====================================================
+            ATMOSPHERIC BACKGROUND
+        ====================================================== */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
 
-        {/* Right Glow */}
-        <div className="absolute right-[-10%] top-[20%] h-[700px] w-[700px] rounded-full bg-[#B89B72]/[0.03] blur-[180px]" />
+          {/* Main Glow */}
+          <div className="absolute left-1/2 top-[-15%] h-[1200px] w-[1200px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.04] blur-[220px]" />
 
-      </div>
+          {/* Right Glow */}
+          <div className="absolute right-[-10%] top-[20%] h-[700px] w-[700px] rounded-full bg-[#B89B72]/[0.03] blur-[180px]" />
 
-      <div className="container-luxury relative z-10 py-32">
+        </div>
 
-        {/* ================= HEADER ================= */}
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 40,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 1,
-          }}
-          className="mb-20"
-        >
+        <div className="container-luxury relative z-10 py-32">
 
-          {/* Label */}
-          <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
-
-            Secure Checkout
-
-          </p>
-
-          {/* Title */}
-          <h1 className="mt-6 text-5xl font-light leading-[0.88] tracking-[-0.08em] text-white md:text-[7rem]">
-
-            Complete
-            <br />
-            Your
-            <br />
-            Experience
-
-          </h1>
-
-        </motion.div>
-
-        {/* ================= GRID ================= */}
-        <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
-
-          {/* ================= LEFT ================= */}
+          {/* =====================================================
+              HEADER
+          ====================================================== */}
           <motion.div
             initial={{
               opacity: 0,
@@ -70,193 +258,295 @@ export default function CheckoutPage() {
             }}
             transition={{
               duration: 1,
-              delay: 0.1,
             }}
-            className="space-y-8"
+            className="mb-20"
           >
 
-            {/* Contact */}
-            <LuxuryCard
-              title="Contact Information"
-            >
+            <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
 
-              <LuxuryInput
-                placeholder="Full Name"
-              />
+              Secure Checkout
 
-              <LuxuryInput
-                placeholder="Email Address"
-              />
+            </p>
 
-              <LuxuryInput
-                placeholder="Phone Number"
-              />
+            <h1 className="mt-6 text-5xl font-light leading-[0.88] tracking-[-0.08em] text-white md:text-[7rem]">
 
-            </LuxuryCard>
+              Complete
+              <br />
+              Your
+              <br />
+              Experience
 
-            {/* Delivery */}
-            <LuxuryCard
-              title="Delivery Address"
-            >
-
-              <LuxuryInput
-                placeholder="Street Address"
-              />
-
-              <LuxuryInput
-                placeholder="Apartment / Suite"
-              />
-
-              <div className="grid gap-4 md:grid-cols-2">
-
-                <LuxuryInput
-                  placeholder="City"
-                />
-
-                <LuxuryInput
-                  placeholder="Postal Code"
-                />
-
-              </div>
-
-            </LuxuryCard>
-
-            {/* Payment */}
-            <LuxuryCard
-              title="Payment Method"
-            >
-
-              <PaymentOption
-                active
-                label="Credit / Debit Card"
-              />
-
-              <PaymentOption
-                label="UPI Payment"
-              />
-
-              <PaymentOption
-                label="Net Banking"
-              />
-
-            </LuxuryCard>
+            </h1>
 
           </motion.div>
 
-          {/* ================= RIGHT ================= */}
-          <motion.div
-            initial={{
-              opacity: 0,
-              x: 40,
-            }}
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            transition={{
-              duration: 1,
-              delay: 0.2,
-            }}
-          >
+          {/* =====================================================
+              GRID
+          ====================================================== */}
+          <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
 
-            <div className="sticky top-10 overflow-hidden rounded-[2.5rem] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-3xl">
+            {/* =================================================
+                LEFT SIDE
+            ================================================== */}
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 40,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 1,
+                delay: 0.1,
+              }}
+              className="space-y-8"
+            >
 
-              {/* Glow */}
-              <div className="pointer-events-none absolute right-[-20%] top-[-10%] h-[300px] w-[300px] rounded-full bg-[#B89B72]/10 blur-[120px]" />
+              {/* Contact */}
+              <LuxuryCard
+                title="Contact Information"
+              >
 
-              {/* Label */}
-              <p className="relative text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
-
-                Order Summary
-
-              </p>
-
-              {/* Items */}
-              <div className="relative mt-10 space-y-6">
-
-                <OrderItem
-                  title="Aurelius Wall Clock"
-                  price="₹1,24,999"
+                <LuxuryInput
+                  placeholder="Full Name"
+                  onChange={(e) =>
+                    setCustomer({
+                      ...customer,
+                      name:
+                        e.target.value,
+                    })
+                  }
                 />
 
-                <OrderItem
-                  title="Architectural Lamp"
-                  price="₹84,999"
+                <LuxuryInput
+                  placeholder="Email Address"
+                  onChange={(e) =>
+                    setCustomer({
+                      ...customer,
+                      email:
+                        e.target.value,
+                    })
+                  }
                 />
 
-              </div>
-
-              {/* Divider */}
-              <div className="relative my-10 h-px bg-white/[0.06]" />
-
-              {/* Totals */}
-              <div className="relative space-y-5">
-
-                <SummaryRow
-                  label="Subtotal"
-                  value="₹2,09,998"
+                <LuxuryInput
+                  placeholder="Phone Number"
+                  onChange={(e) =>
+                    setCustomer({
+                      ...customer,
+                      phone:
+                        e.target.value,
+                    })
+                  }
                 />
 
-                <SummaryRow
-                  label="Luxury Handling"
-                  value="₹2,000"
+              </LuxuryCard>
+
+              {/* Address */}
+              <LuxuryCard
+                title="Delivery Address"
+              >
+
+                <LuxuryInput
+                  placeholder="Street Address"
+                  onChange={(e) =>
+                    setCustomer({
+                      ...customer,
+                      address:
+                        e.target.value,
+                    })
+                  }
                 />
 
-                <SummaryRow
-                  label="Shipping"
-                  value="Complimentary"
+                <LuxuryInput
+                  placeholder="Apartment / Suite"
                 />
 
-              </div>
+                <div className="grid gap-4 md:grid-cols-2">
 
-              {/* Total */}
-              <div className="relative mt-10 flex items-end justify-between">
+                  <LuxuryInput
+                    placeholder="City"
+                    onChange={(e) =>
+                      setCustomer({
+                        ...customer,
+                        city:
+                          e.target.value,
+                      })
+                    }
+                  />
 
-                <div>
-
-                  <p className="text-[10px] uppercase tracking-[0.45em] text-white/35">
-
-                    Total
-
-                  </p>
-
-                  <p className="mt-3 text-5xl font-light tracking-[-0.06em] text-white">
-
-                    ₹2,11,998
-
-                  </p>
+                  <LuxuryInput
+                    placeholder="Postal Code"
+                    onChange={(e) =>
+                      setCustomer({
+                        ...customer,
+                        postalCode:
+                          e.target.value,
+                      })
+                    }
+                  />
 
                 </div>
 
+              </LuxuryCard>
+
+              {/* Payment */}
+              <LuxuryCard
+                title="Payment Method"
+              >
+
+                <PaymentOption
+                  active
+                  label="Credit / Debit Card"
+                />
+
+                <PaymentOption
+                  label="UPI Payment"
+                />
+
+                <PaymentOption
+                  label="Net Banking"
+                />
+
+              </LuxuryCard>
+
+            </motion.div>
+
+            {/* =================================================
+                RIGHT SIDE
+            ================================================== */}
+            <motion.div
+              initial={{
+                opacity: 0,
+                x: 40,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              transition={{
+                duration: 1,
+                delay: 0.2,
+              }}
+            >
+
+              <div className="sticky top-10 overflow-hidden rounded-[2.5rem] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-3xl">
+
+                {/* Glow */}
+                <div className="pointer-events-none absolute right-[-20%] top-[-10%] h-[300px] w-[300px] rounded-full bg-[#B89B72]/10 blur-[120px]" />
+
+                {/* Title */}
+                <p className="relative text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
+
+                  Order Summary
+
+                </p>
+
+                {/* Items */}
+                <div className="relative mt-10 space-y-6">
+
+                  {items.map((item) => (
+
+                    <OrderItem
+                      key={item.id}
+                      title={item.title}
+                      price={`₹${(
+                        item.price *
+                        item.quantity
+                      ).toLocaleString("en-IN")}`}
+                    />
+
+                  ))}
+
+                </div>
+
+                {/* Divider */}
+                <div className="relative my-10 h-px bg-white/[0.06]" />
+
+                {/* Totals */}
+                <div className="relative space-y-5">
+
+                  <SummaryRow
+                    label="Subtotal"
+                    value={`₹${total.toLocaleString("en-IN")}`}
+                  />
+
+                  <SummaryRow
+                    label="Luxury Handling"
+                    value="Complimentary"
+                  />
+
+                  <SummaryRow
+                    label="Shipping"
+                    value="Complimentary"
+                  />
+
+                </div>
+
+                {/* Total */}
+                <div className="relative mt-10 flex items-end justify-between">
+
+                  <div>
+
+                    <p className="text-[10px] uppercase tracking-[0.45em] text-white/35">
+
+                      Total
+
+                    </p>
+
+                    <p className="mt-3 text-5xl font-light tracking-[-0.06em] text-white">
+
+                      ₹
+                      {total.toLocaleString(
+                        "en-IN"
+                      )}
+
+                    </p>
+
+                  </div>
+
+                </div>
+
+                {/* CTA */}
+                <button
+                  onClick={
+                    handlePayment
+                  }
+                  disabled={loading}
+                  className="group relative mt-10 w-full overflow-hidden rounded-full bg-[#B89B72] py-5 text-sm uppercase tracking-[0.35em] text-black transition duration-700 hover:scale-[1.02]"
+                >
+
+                  {/* Sweep */}
+                  <div className="absolute inset-y-0 left-[-30%] w-[30%] rotate-12 bg-white/30 blur-2xl transition duration-1000 group-hover:left-[120%]" />
+
+                  <span className="relative z-10">
+
+                    {loading
+                      ? "Processing..."
+                      : "Complete Purchase"}
+
+                  </span>
+
+                </button>
+
               </div>
 
-              {/* CTA */}
-              <button className="group relative mt-10 w-full overflow-hidden rounded-full bg-[#B89B72] py-5 text-sm uppercase tracking-[0.35em] text-black transition duration-700 hover:scale-[1.02]">
+            </motion.div>
 
-                {/* Sweep */}
-                <div className="absolute inset-y-0 left-[-30%] w-[30%] rotate-12 bg-white/30 blur-2xl transition duration-1000 group-hover:left-[120%]" />
-
-                <span className="relative z-10">
-
-                  Complete Purchase
-
-                </span>
-
-              </button>
-
-            </div>
-
-          </motion.div>
+          </div>
 
         </div>
 
-      </div>
-
-    </main>
+      </main>
+    </>
   );
 }
 
-/* ================= LUXURY CARD ================= */
+/* =========================================================
+   LUXURY CARD
+========================================================== */
 
 function LuxuryCard({
   title,
@@ -284,22 +574,32 @@ function LuxuryCard({
   );
 }
 
-/* ================= INPUT ================= */
+/* =========================================================
+   INPUT
+========================================================== */
 
 function LuxuryInput({
   placeholder,
+  onChange,
 }: {
   placeholder: string;
+
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void;
 }) {
   return (
     <input
       placeholder={placeholder}
+      onChange={onChange}
       className="h-16 w-full rounded-full border border-white/[0.06] bg-white/[0.03] px-6 text-sm tracking-[0.08em] text-white outline-none transition duration-500 placeholder:text-white/30 focus:border-[#B89B72]/40"
     />
   );
 }
 
-/* ================= PAYMENT ================= */
+/* =========================================================
+   PAYMENT OPTION
+========================================================== */
 
 function PaymentOption({
   label,
@@ -335,7 +635,9 @@ function PaymentOption({
   );
 }
 
-/* ================= ORDER ITEM ================= */
+/* =========================================================
+   ORDER ITEM
+========================================================== */
 
 function OrderItem({
   title,
@@ -373,7 +675,9 @@ function OrderItem({
   );
 }
 
-/* ================= SUMMARY ROW ================= */
+/* =========================================================
+   SUMMARY ROW
+========================================================== */
 
 function SummaryRow({
   label,

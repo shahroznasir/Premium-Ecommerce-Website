@@ -47,6 +47,7 @@ const categories = [
 export default function ShopClient({
   products,
 }: ShopClientProps) {
+
   const [selectedCategory, setSelectedCategory] =
     useState("All");
 
@@ -67,9 +68,10 @@ export default function ShopClient({
 
   const filteredProducts =
     useMemo(() => {
+
       let filtered = [...products];
 
-      // Category
+      /* CATEGORY */
       if (
         selectedCategory !== "All"
       ) {
@@ -81,7 +83,7 @@ export default function ShopClient({
           );
       }
 
-      // Search
+      /* SEARCH */
       if (search) {
         filtered =
           filtered.filter((product) =>
@@ -93,7 +95,7 @@ export default function ShopClient({
           );
       }
 
-      // Sorting
+      /* SORTING */
       if (sort === "low") {
         filtered.sort(
           (a, b) =>
@@ -109,6 +111,7 @@ export default function ShopClient({
       }
 
       return filtered;
+
     }, [
       products,
       selectedCategory,
@@ -116,9 +119,14 @@ export default function ShopClient({
       sort,
     ]);
 
+  /* =========================================================
+     ADD TO CART
+  ========================================================== */
+
   const handleAddToCart = (
     product: Product
   ) => {
+
     addItem({
       id: product.id,
       title: product.title,
@@ -138,72 +146,36 @@ export default function ShopClient({
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
 
-      {/* ================= ATMOSPHERE ================= */}
+      {/* =========================================================
+          ATMOSPHERIC DEPTH
+      ========================================================== */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
         {/* Main Glow */}
-        <div className="absolute left-1/2 top-[-10%] h-[1000px] w-[1000px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.035] blur-[180px]" />
+        <div className="absolute left-1/2 top-[-10%] h-[900px] w-[900px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.03] blur-[160px]" />
 
         {/* Ambient Ring */}
-        <div className="absolute left-1/2 top-[10%] h-[1400px] w-[1400px] -translate-x-1/2 rounded-full border border-white/[0.03]" />
+        <div className="absolute left-1/2 top-[5%] h-[1300px] w-[1300px] -translate-x-1/2 rounded-full border border-white/[0.025]" />
 
       </div>
 
-      {/* ================= HERO ================= */}
-      <section className="relative z-10 border-b border-white/[0.06] pt-36">
-
-        <div className="container-luxury pb-20">
-
-          <div className="max-w-4xl">
-
-            {/* Label */}
-            <p className="mb-8 text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/75">
-
-              Curated Luxury Commerce
-
-            </p>
-
-            {/* Heading */}
-            <h1 className="max-w-[10ch] text-5xl font-light leading-[0.88] tracking-[-0.08em] text-white md:text-[6.5rem]">
-
-              Objects
-              <br />
-              For Elevated
-              <br />
-              Living
-
-            </h1>
-
-            {/* Description */}
-            <p className="mt-10 max-w-2xl text-[1rem] leading-[2] text-white/48">
-
-              Discover sculptural interiors,
-              timeless lighting, and
-              architectural objects curated
-              through restraint, atmosphere,
-              and refined modern luxury.
-
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= SHOP ================= */}
+      {/* =========================================================
+          SHOP EXPERIENCE
+      ========================================================== */}
       <section className="relative z-10">
 
-        <div className="container-luxury py-16">
+        <div className="container-luxury py-10 md:py-14">
 
-          <div className="grid gap-14 lg:grid-cols-[280px_1fr]">
+          <div className="grid gap-10 lg:grid-cols-[280px_1fr] xl:gap-14">
 
-            {/* ================= SIDEBAR ================= */}
+            {/* =====================================================
+                SIDEBAR
+            ====================================================== */}
             <aside className="sticky top-28 hidden h-fit lg:block">
 
-              <div className="overflow-hidden rounded-[2rem] border border-white/[0.05] bg-[#0A0A0A]">
+              <div className="overflow-hidden rounded-[2.4rem] border border-white/[0.05] bg-[#0A0A0A]/90 backdrop-blur-md">
 
-                {/* Header */}
+                {/* HEADER */}
                 <div className="flex items-center justify-between border-b border-white/[0.05] p-7">
 
                   <div className="flex items-center gap-3">
@@ -213,7 +185,7 @@ export default function ShopClient({
                       className="text-[#B89B72]"
                     />
 
-                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">
+                    <p className="text-[10px] uppercase tracking-[0.38em] text-white/60">
 
                       Refine
 
@@ -231,10 +203,10 @@ export default function ShopClient({
 
                 </div>
 
-                {/* Search */}
+                {/* SEARCH */}
                 <div className="border-b border-white/[0.05] p-7">
 
-                  <div className="flex items-center gap-4 rounded-full border border-white/[0.05] bg-black/20 px-5 py-4">
+                  <div className="flex items-center gap-4 rounded-full border border-white/[0.05] bg-black/20 px-5 py-4 backdrop-blur-md">
 
                     <Search
                       size={15}
@@ -256,10 +228,10 @@ export default function ShopClient({
 
                 </div>
 
-                {/* Categories */}
+                {/* COLLECTIONS */}
                 <div className="p-7">
 
-                  <p className="mb-7 text-[10px] uppercase tracking-[0.35em] text-[#B89B72]/70">
+                  <p className="mb-7 text-[10px] uppercase tracking-[0.38em] text-[#B89B72]/70">
 
                     Collections
 
@@ -276,11 +248,11 @@ export default function ShopClient({
                               category
                             )
                           }
-                          className={`flex w-full items-center justify-between rounded-full px-5 py-4 text-left text-sm transition duration-300 ${
+                          className={`flex w-full items-center justify-between rounded-full px-5 py-4 text-left text-sm transition-all duration-500 ${
                             selectedCategory ===
                             category
                               ? "bg-white text-black"
-                              : "border border-white/[0.05] bg-white/[0.02] text-white/65 hover:border-white/[0.08]"
+                              : "border border-white/[0.05] bg-white/[0.02] text-white/65 hover:border-[#B89B72]/20 hover:bg-white/[0.04]"
                           }`}
                         >
 
@@ -294,10 +266,10 @@ export default function ShopClient({
 
                 </div>
 
-                {/* Sorting */}
+                {/* SORT */}
                 <div className="border-t border-white/[0.05] p-7">
 
-                  <p className="mb-5 text-[10px] uppercase tracking-[0.35em] text-[#B89B72]/70">
+                  <p className="mb-5 text-[10px] uppercase tracking-[0.38em] text-[#B89B72]/70">
 
                     Sort
 
@@ -335,26 +307,58 @@ export default function ShopClient({
 
                 </div>
 
+                {/* SPATIAL PHILOSOPHY */}
+                <div className="border-t border-white/[0.05] p-7">
+
+                  <p className="text-[10px] uppercase tracking-[0.45em] text-[#c9a961]">
+
+                    Spatial Philosophy
+
+                  </p>
+
+                  <p className="mt-5 text-sm leading-8 text-white/40">
+
+                    Designed for cinematic interiors,
+                    sculptural restraint, timeless
+                    architecture, and elevated living.
+
+                  </p>
+
+                </div>
+
               </div>
 
             </aside>
 
-            {/* ================= PRODUCTS ================= */}
+            {/* =====================================================
+                PRODUCTS
+            ====================================================== */}
             <div>
 
-              {/* Top Bar */}
+              {/* TOP BAR */}
               <div className="mb-12 flex items-center justify-between border-b border-white/[0.05] pb-7">
 
-                <p className="text-[10px] uppercase tracking-[0.4em] text-[#B89B72]/70">
+                <div>
 
-                  Curated Objects
+                  <p className="text-[10px] uppercase tracking-[0.42em] text-[#c9a961]/80">
 
-                </p>
+                    Curated Objects
 
+                  </p>
+
+                  <p className="mt-3 text-sm text-white/38">
+
+                    Architectural luxury collection
+
+                  </p>
+
+                </div>
+
+                {/* ACTIONS */}
                 <div className="flex items-center gap-3">
 
                   {/* Wishlist */}
-                  <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition duration-300 hover:border-white/[0.08] hover:text-white">
+                  <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white">
 
                     <Heart size={15} />
 
@@ -363,7 +367,7 @@ export default function ShopClient({
                   {/* Cart */}
                   <button
                     onClick={openCart}
-                    className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition duration-300 hover:border-white/[0.08] hover:text-white"
+                    className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white"
                   >
 
                     <ShoppingBag
@@ -393,7 +397,9 @@ export default function ShopClient({
 
               </div>
 
-              {/* Products Grid */}
+              {/* =====================================================
+                  PRODUCTS GRID
+              ====================================================== */}
               <AnimatePresence mode="wait">
 
                 <motion.div
@@ -411,9 +417,9 @@ export default function ShopClient({
                     y: 20,
                   }}
                   transition={{
-                    duration: 0.4,
+                    duration: 0.45,
                   }}
-                  className="grid gap-7 md:grid-cols-2 2xl:grid-cols-3"
+                  className="grid gap-8 md:grid-cols-2 2xl:grid-cols-3"
                 >
 
                   {filteredProducts.map(
@@ -425,14 +431,14 @@ export default function ShopClient({
                         key={product.id}
                         initial={{
                           opacity: 0,
-                          y: 40,
+                          y: 50,
                         }}
                         whileInView={{
                           opacity: 1,
                           y: 0,
                         }}
                         transition={{
-                          duration: 0.7,
+                          duration: 0.8,
                           delay:
                             index * 0.05,
                         }}
@@ -442,33 +448,38 @@ export default function ShopClient({
                         className="group relative"
                       >
 
-                        {/* ================= CARD ================= */}
-                        <div className="group relative overflow-hidden rounded-[2.2rem] border border-white/[0.05] bg-[#0A0A0A] transition duration-500 hover:border-white/[0.08]">
+                        {/* =================================================
+                            PRODUCT CARD
+                        ================================================== */}
+                        <div className="group relative overflow-hidden rounded-[2.6rem] border border-white/[0.05] bg-[#0A0A0A]/90 backdrop-blur-md transition-all duration-700 hover:-translate-y-2 hover:border-[#B89B72]/20">
 
-                          {/* Image */}
-                          <div className="relative overflow-hidden bg-[#0F0F0F]">
+                          {/* IMAGE */}
+                          <div className="relative aspect-[0.72] overflow-hidden bg-[#0F0F0F]">
 
-                            <div className="relative h-[520px] overflow-hidden">
+                            <LuxuryImage
+                              src={
+                                product.image
+                              }
+                              alt={
+                                product.title
+                              }
+                              className="h-full w-full object-cover transition-transform duration-[1800ms] ease-out group-hover:scale-[1.03]"
+                            />
 
-                              <LuxuryImage
-                                src={
-                                  product.image
-                                }
-                                alt={
-                                  product.title
-                                }
-                                className="h-full w-full transition duration-[1600ms] group-hover:scale-[1.015]"
-                              />
+                            {/* OVERLAYS */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
 
-                            </div>
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,169,97,0.12),transparent_40%)]" />
+
+                            <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.45)]" />
 
                           </div>
 
-                          {/* Content */}
+                          {/* CONTENT */}
                           <div className="px-8 pb-8 pt-7">
 
-                            {/* Category */}
-                            <p className="text-[10px] uppercase tracking-[0.32em] text-white/35">
+                            {/* CATEGORY */}
+                            <p className="text-[10px] uppercase tracking-[0.4em] text-[#c9a961]/78">
 
                               {
                                 product.category
@@ -476,12 +487,12 @@ export default function ShopClient({
 
                             </p>
 
-                            {/* Title */}
+                            {/* TITLE */}
                             <Link
                               href={`/shop/${product.slug}`}
                             >
 
-                              <h2 className="mt-5 max-w-[12ch] text-[2.1rem] font-light leading-[1] tracking-[-0.06em] text-white transition duration-300 hover:text-[#D6C2A3]">
+                              <h2 className="mt-5 max-w-[11ch] font-serif text-[2.2rem] leading-[0.92] tracking-[-0.06em] text-white transition-all duration-500 hover:text-[#D6C2A3]">
 
                                 {
                                   product.title
@@ -491,23 +502,29 @@ export default function ShopClient({
 
                             </Link>
 
-                            {/* Description */}
-                            <p className="mt-5 max-w-[32ch] text-[0.95rem] leading-[1.9] text-white/42">
+                            {/* DESCRIPTION */}
+                            <p className="mt-5 max-w-[30ch] text-[0.95rem] leading-[1.95] text-white/42">
 
-                              Sculptural luxury object designed
-                              through architectural restraint,
-                              timeless materiality, and refined
-                              modern living.
+                              Sculptural luxury object
+                              designed through architectural
+                              restraint, timeless materiality,
+                              and refined modern living.
 
                             </p>
 
-                            {/* Bottom */}
-                            <div className="mt-10 flex items-center justify-between">
+                            {/* BOTTOM */}
+                            <div className="mt-10 flex items-center justify-between gap-5">
 
-                              {/* Price */}
+                              {/* PRICE */}
                               <div>
 
-                                <p className="text-[1.7rem] font-light tracking-[-0.05em] text-white">
+                                <p className="text-[9px] uppercase tracking-[0.34em] text-white/28">
+
+                                  Curated Piece
+
+                                </p>
+
+                                <p className="mt-3 text-[1.7rem] font-light tracking-[-0.05em] text-white">
 
                                   ₹
                                   {product.price.toLocaleString(
@@ -518,11 +535,11 @@ export default function ShopClient({
 
                               </div>
 
-                              {/* Actions */}
+                              {/* ACTIONS */}
                               <div className="flex items-center gap-3">
 
                                 {/* Wishlist */}
-                                <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.02] text-white/55 transition duration-300 hover:border-white/[0.12] hover:text-white">
+                                <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.02] text-white/55 transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white">
 
                                   <Heart
                                     size={15}
@@ -537,7 +554,7 @@ export default function ShopClient({
                                       product
                                     )
                                   }
-                                  className={`rounded-full px-6 py-3 text-[10px] uppercase tracking-[0.32em] transition duration-300 ${
+                                  className={`rounded-full px-6 py-3 text-[10px] uppercase tracking-[0.34em] transition-all duration-500 ${
                                     addedId ===
                                     product.id
                                       ? "bg-white text-black"
@@ -576,7 +593,9 @@ export default function ShopClient({
 
       </section>
 
-      {/* ================= RECENTLY VIEWED ================= */}
+      {/* =========================================================
+          RECENTLY VIEWED
+      ========================================================== */}
       <RecentlyViewedCarousel />
 
     </main>

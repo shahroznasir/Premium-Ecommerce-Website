@@ -77,17 +77,17 @@ export default function Navbar() {
     useCartUIStore();
 
   /* =========================================================
-     ATMOSPHERIC NAVBAR MOTION
+     CINEMATIC MOTION
   ========================================================== */
 
   const navbarScale =
     useTransform(
-      () => 1 - progress * 0.01
+      () => 1 - progress * 0.008
     );
 
   const navbarY =
     useTransform(
-      () => progress * -3
+      () => progress * -2
     );
 
   useMotionValueEvent(
@@ -128,7 +128,7 @@ export default function Navbar() {
           y:
             prefersReducedMotion
               ? 0
-              : -50,
+              : -40,
           opacity: 0,
         }}
         animate={{
@@ -143,25 +143,28 @@ export default function Navbar() {
           scale: navbarScale,
           y: navbarY,
         }}
-        className="fixed left-1/2 top-4 md:top-6 z-[9999] w-[94%] max-w-[1460px] -translate-x-1/2"
+        className="fixed left-1/2 top-4 z-[9999] w-[94%] max-w-[1460px] -translate-x-1/2 md:top-6"
       >
 
         {/* =========================================================
             SHELL
         ========================================================== */}
         <div
-          className={`relative overflow-hidden rounded-[2rem] border transition-all duration-700 ${
+          className={`relative overflow-hidden rounded-[2rem] border transition-all duration-700 after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-[40%] after:-translate-x-1/2 after:bg-gradient-to-r after:from-transparent after:via-[#c9a961]/20 after:to-transparent ${
             scrolled
-              ? "border-white/[0.05] bg-black/22 backdrop-blur-md"
-              : "border-white/[0.04] bg-black/12 backdrop-blur-sm"
+              ? "border-white/[0.05] bg-black/30 backdrop-blur-xl"
+              : "border-white/[0.04] bg-black/18 backdrop-blur-md"
           }`}
         >
 
-          {/* Subtle Reflection */}
+          {/* Ambient Reflection */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent" />
 
-          {/* Atmospheric Edge */}
+          {/* Top Highlight */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
+
+          {/* Soft Glow */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,169,97,0.06),transparent_45%)] opacity-80" />
 
           {/* =========================================================
               CONTENT
@@ -174,9 +177,9 @@ export default function Navbar() {
             }`}
           >
 
-            {/* =========================================================
+            {/* =====================================================
                 LOGO
-            ========================================================== */}
+            ====================================================== */}
             <Link
               href="/"
               className="group flex items-center"
@@ -196,9 +199,9 @@ export default function Navbar() {
 
             </Link>
 
-            {/* =========================================================
+            {/* =====================================================
                 NAVIGATION
-            ========================================================== */}
+            ====================================================== */}
             <nav className="hidden items-center gap-10 lg:flex">
 
               {navLinks.map((link) => (
@@ -217,9 +220,9 @@ export default function Navbar() {
 
             </nav>
 
-            {/* =========================================================
+            {/* =====================================================
                 RIGHT SIDE
-            ========================================================== */}
+            ====================================================== */}
             <div className="flex items-center gap-2 md:gap-3">
 
               {/* Consultation */}
@@ -230,7 +233,7 @@ export default function Navbar() {
                 transition={{
                   duration: 0.25,
                 }}
-                className="hidden rounded-[1.1rem] border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-white/85 transition duration-500 hover:border-[#D6C2A3]/40 hover:bg-white/[0.06] xl:block"
+                className="hidden rounded-[1.1rem] border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-white/85 transition-all duration-500 hover:border-[#D6C2A3]/40 hover:bg-white/[0.06] xl:block"
               >
 
                 Consultation
@@ -315,14 +318,17 @@ function LuxuryIconButton({
         y: -1,
       }}
       whileTap={{
-        scale: 0.98,
+        scale: 0.985,
       }}
       transition={{
         duration: 0.2,
       }}
       onClick={onClick}
-      className="group relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center overflow-hidden rounded-[1rem] border border-white/[0.05] bg-white/[0.03] transition duration-500 hover:border-[#D6C2A3]/40 hover:bg-white/[0.05]"
+      className="group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[1rem] border border-white/[0.05] bg-white/[0.03] transition-all duration-500 hover:border-[#D6C2A3]/40 hover:bg-white/[0.05] md:h-10 md:w-10"
     >
+
+      {/* Glow */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,169,97,0.10),transparent_50%)] opacity-0 transition duration-700 group-hover:opacity-100" />
 
       {children}
 

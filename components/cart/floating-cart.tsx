@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import {
   motion,
@@ -17,6 +18,9 @@ import { useCartStore } from "@/stores/cart-store";
 import { useCartUIStore } from "@/stores/cart-ui-store";
 
 export default function FloatingCart() {
+
+  const router = useRouter();
+
   const {
     items,
     removeItem,
@@ -30,22 +34,47 @@ export default function FloatingCart() {
     closeCart,
   } = useCartUIStore();
 
+  /* =========================================================
+     HANDLE CHECKOUT
+  ========================================================== */
+
+  function handleCheckout() {
+
+    closeCart();
+
+    setTimeout(() => {
+
+      router.push("/checkout");
+
+    }, 250);
+  }
+
   return (
     <AnimatePresence>
 
       {isOpen && (
         <>
 
-          {/* ================= BACKDROP ================= */}
+          {/* =====================================================
+              BACKDROP
+          ====================================================== */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
             onClick={closeCart}
-            className="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-[20px]"
+            className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-[20px]"
           />
 
-          {/* ================= CART PANEL ================= */}
+          {/* =====================================================
+              CART PANEL
+          ====================================================== */}
           <motion.div
             initial={{
               x: "100%",
@@ -63,15 +92,21 @@ export default function FloatingCart() {
             className="fixed right-0 top-0 z-[9999] flex h-screen w-full max-w-[520px] flex-col overflow-hidden border-l border-white/[0.06] bg-[#050505]/95 backdrop-blur-3xl"
           >
 
-            {/* ================= ATMOSPHERE ================= */}
+            {/* =====================================================
+                ATMOSPHERIC GLOW
+            ====================================================== */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
               <div className="absolute right-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-[#B89B72]/10 blur-[140px]" />
 
+              <div className="absolute bottom-[-20%] left-[-10%] h-[400px] w-[400px] rounded-full bg-[#B89B72]/5 blur-[120px]" />
+
             </div>
 
-            {/* ================= HEADER ================= */}
-            <div className="relative z-10 flex items-center justify-between border-b border-white/[0.06] px-8 py-7">
+            {/* =====================================================
+                HEADER
+            ====================================================== */}
+            <div className="relative z-10 flex items-center justify-between border-b border-white/[0.06] px-6 py-6 md:px-8 md:py-7">
 
               <div>
 
@@ -81,7 +116,7 @@ export default function FloatingCart() {
 
                 </p>
 
-                <h2 className="mt-3 text-3xl font-light tracking-[-0.06em] text-white">
+                <h2 className="mt-3 text-2xl font-light tracking-[-0.06em] text-white md:text-3xl">
 
                   Shopping Bag
 
@@ -89,9 +124,10 @@ export default function FloatingCart() {
 
               </div>
 
+              {/* Close */}
               <button
                 onClick={closeCart}
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] text-white/60 transition duration-500 hover:border-[#B89B72]/30 hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] text-white/60 transition duration-500 hover:border-[#B89B72]/30 hover:text-white"
               >
 
                 <X size={18} />
@@ -100,8 +136,11 @@ export default function FloatingCart() {
 
             </div>
 
-            {/* ================= EMPTY ================= */}
+            {/* =====================================================
+                EMPTY STATE
+            ====================================================== */}
             {items.length === 0 && (
+
               <div className="flex flex-1 flex-col items-center justify-center px-10 text-center">
 
                 <div className="h-32 w-32 rounded-full bg-[#B89B72]/10 blur-3xl" />
@@ -121,53 +160,74 @@ export default function FloatingCart() {
                 </h3>
 
               </div>
+
             )}
 
-            {/* ================= ITEMS ================= */}
+            {/* =====================================================
+                ITEMS
+            ====================================================== */}
             {items.length > 0 && (
               <>
-                <div className="relative z-10 flex-1 overflow-y-auto px-6 py-6">
+
+                {/* =================================================
+                    SCROLL AREA
+                ================================================== */}
+                <div className="relative z-10 flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
 
                   <div className="space-y-5">
 
                     {items.map((item) => (
-                      <div
+
+                      <motion.div
                         key={item.id}
+                        initial={{
+                          opacity: 0,
+                          y: 20,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                        }}
                         className="group rounded-[2rem] border border-white/[0.06] bg-white/[0.03] p-4 transition duration-500 hover:border-[#B89B72]/20"
                       >
 
-                        <div className="flex gap-5">
+                        <div className="flex gap-4">
 
-                          {/* Image */}
-                          <div className="relative h-32 w-28 overflow-hidden rounded-[1.5rem]">
+                          {/* =========================================
+                              IMAGE
+                          ========================================== */}
+                          <div className="relative h-28 w-24 overflow-hidden rounded-[1.5rem] md:h-32 md:w-28">
 
                             <Image
                               src={item.image}
                               alt={item.title}
                               fill
+                              sizes="200px"
                               className="object-cover transition duration-700 group-hover:scale-[1.04]"
                             />
 
                           </div>
 
-                          {/* Content */}
+                          {/* =========================================
+                              CONTENT
+                          ========================================== */}
                           <div className="flex flex-1 flex-col justify-between">
 
                             <div>
 
-                              <p className="text-[10px] uppercase tracking-[0.35em] text-[#B89B72]/60">
+                              <p className="text-[9px] uppercase tracking-[0.35em] text-[#B89B72]/60">
 
                                 Curated Object
 
                               </p>
 
-                              <h3 className="mt-3 text-[1.25rem] font-light leading-[1.1] tracking-[-0.04em] text-white">
+                              <h3 className="mt-2 text-[1.15rem] font-light leading-[1.1] tracking-[-0.04em] text-white md:text-[1.25rem]">
 
                                 {item.title}
 
                               </h3>
 
-                              <p className="mt-4 text-lg text-white/70">
+                              <p className="mt-3 text-lg text-white/70">
 
                                 ₹
                                 {item.price.toLocaleString(
@@ -178,10 +238,12 @@ export default function FloatingCart() {
 
                             </div>
 
-                            {/* Quantity */}
+                            {/* =====================================
+                                QUANTITY
+                            ====================================== */}
                             <div className="mt-5 flex items-center justify-between">
 
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
 
                                 {/* Minus */}
                                 <button
@@ -245,18 +307,21 @@ export default function FloatingCart() {
 
                         </div>
 
-                      </div>
+                      </motion.div>
+
                     ))}
 
                   </div>
 
                 </div>
 
-                {/* ================= FOOTER ================= */}
-                <div className="relative z-10 border-t border-white/[0.06] bg-black/40 p-6 backdrop-blur-3xl">
+                {/* =================================================
+                    FOOTER
+                ================================================== */}
+                <div className="relative z-10 border-t border-white/[0.06] bg-black/40 p-5 backdrop-blur-3xl md:p-6">
 
                   {/* Total */}
-                  <div className="flex items-end justify-between">
+                  <div className="flex items-end justify-between gap-5">
 
                     <div>
 
@@ -266,7 +331,7 @@ export default function FloatingCart() {
 
                       </p>
 
-                      <h3 className="mt-3 text-4xl font-light tracking-[-0.06em] text-white">
+                      <h3 className="mt-3 text-3xl font-light tracking-[-0.06em] text-white md:text-4xl">
 
                         ₹
                         {getTotalPrice().toLocaleString(
@@ -277,16 +342,23 @@ export default function FloatingCart() {
 
                     </div>
 
-                    <p className="max-w-[140px] text-right text-sm leading-[1.7] text-white/40">
+                    <p className="max-w-[140px] text-right text-xs leading-[1.8] text-white/40 md:text-sm">
 
-                      Taxes & premium delivery included
+                      Taxes &
+                      premium delivery
+                      included
 
                     </p>
 
                   </div>
 
-                  {/* Checkout */}
-                  <button className="group relative mt-7 flex h-16 w-full items-center justify-center overflow-hidden rounded-full bg-[#B89B72] text-sm uppercase tracking-[0.45em] text-black transition duration-500 hover:scale-[1.01]">
+                  {/* =============================================
+                      CHECKOUT BUTTON
+                  ============================================== */}
+                  <button
+                    onClick={handleCheckout}
+                    className="group relative mt-7 flex h-16 w-full items-center justify-center overflow-hidden rounded-full bg-[#B89B72] text-sm uppercase tracking-[0.45em] text-black transition duration-500 hover:scale-[1.01]"
+                  >
 
                     {/* Reflection */}
                     <div className="absolute inset-y-0 left-[-30%] w-[30%] rotate-12 bg-white/40 blur-2xl transition duration-1000 group-hover:left-[120%]" />
@@ -300,6 +372,7 @@ export default function FloatingCart() {
                   </button>
 
                 </div>
+
               </>
             )}
 
