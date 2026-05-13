@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import {
   motion,
   AnimatePresence,
@@ -20,6 +22,7 @@ interface CinematicGalleryProps {
 export default function CinematicGallery({
   images,
 }: CinematicGalleryProps) {
+
   const [activeIndex, setActiveIndex] =
     useState(0);
 
@@ -44,10 +47,10 @@ export default function CinematicGallery({
 
   return (
     <>
-      {/* ================= MAIN GALLERY ================= */}
+      {/* MAIN GALLERY */}
       <div className="relative">
 
-        {/* Main Image */}
+        {/* MAIN IMAGE */}
         <motion.div
           layoutId={`gallery-${activeIndex}`}
           onClick={() =>
@@ -56,18 +59,29 @@ export default function CinematicGallery({
           className="group relative cursor-zoom-in overflow-hidden rounded-[3rem]"
         >
 
-          {/* Image */}
-          <img
-            src={images[activeIndex]}
-            alt="Product"
-            className="h-[900px] w-full object-cover transition duration-[2200ms] group-hover:scale-[1.04]"
-          />
+          {/* IMAGE */}
+          <div className="relative h-[760px] w-full overflow-hidden md:h-[900px]">
 
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            <Image
+              src={images[activeIndex]}
+              alt="Luxury Product"
+              fill
+              priority
+              quality={88}
+              sizes="(max-width: 768px) 100vw, 55vw"
+              className="object-cover will-change-transform transform-gpu transition-transform duration-[2200ms] ease-out group-hover:scale-[1.02]"
+            />
 
-          {/* Zoom Hint */}
-          <div className="absolute bottom-8 right-8 rounded-full border border-white/[0.08] bg-black/40 px-5 py-3 text-[10px] uppercase tracking-[0.35em] text-white backdrop-blur-2xl opacity-0 transition duration-700 group-hover:opacity-100">
+          </div>
+
+          {/* OVERLAY */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+
+          {/* VIGNETTE */}
+          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.45)]" />
+
+          {/* ZOOM HINT */}
+          <div className="absolute bottom-8 right-8 rounded-full border border-white/[0.08] bg-black/30 px-5 py-3 text-[10px] uppercase tracking-[0.35em] text-white/80 backdrop-blur-md opacity-0 transition-all duration-500 group-hover:opacity-100">
 
             Expand View
 
@@ -75,11 +89,11 @@ export default function CinematicGallery({
 
         </motion.div>
 
-        {/* ================= NAVIGATION ================= */}
-        <div className="mt-6 flex items-center justify-between">
+        {/* NAVIGATION */}
+        <div className="mt-6 flex items-center justify-between gap-5">
 
-          {/* Thumbnails */}
-          <div className="flex gap-4 overflow-x-auto pb-2">
+          {/* THUMBNAILS */}
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
 
             {images.map(
               (image, index) => (
@@ -88,18 +102,34 @@ export default function CinematicGallery({
                   onClick={() =>
                     setActiveIndex(index)
                   }
-                  className={`relative overflow-hidden rounded-[1.5rem] border transition duration-500 ${
+                  className={`group relative overflow-hidden rounded-[1.6rem] border transition-all duration-500 ${
                     activeIndex === index
-                      ? "border-[#B89B72]/50"
+                      ? "border-[#B89B72]/40"
                       : "border-white/[0.06]"
                   }`}
                 >
 
-                  <img
-                    src={image}
-                    alt="Thumbnail"
-                    className="h-28 w-28 object-cover"
-                  />
+                  <div className="relative h-28 w-28 overflow-hidden">
+
+                    <Image
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      fill
+                      quality={75}
+                      sizes="120px"
+                      className={`object-cover transition duration-700 group-hover:scale-[1.03] ${
+                        activeIndex === index
+                          ? "scale-[1.02]"
+                          : ""
+                      }`}
+                    />
+
+                  </div>
+
+                  {/* ACTIVE GLOW */}
+                  {activeIndex === index && (
+                    <div className="pointer-events-none absolute inset-0 bg-[#B89B72]/[0.08]" />
+                  )}
 
                 </button>
               )
@@ -107,12 +137,12 @@ export default function CinematicGallery({
 
           </div>
 
-          {/* Arrows */}
+          {/* ARROWS */}
           <div className="hidden items-center gap-3 md:flex">
 
             <button
               onClick={prevImage}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] transition duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
             >
 
               <ChevronLeft className="h-5 w-5 text-white/70" />
@@ -121,7 +151,7 @@ export default function CinematicGallery({
 
             <button
               onClick={nextImage}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] transition duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
             >
 
               <ChevronRight className="h-5 w-5 text-white/70" />
@@ -134,7 +164,7 @@ export default function CinematicGallery({
 
       </div>
 
-      {/* ================= FULLSCREEN ================= */}
+      {/* FULLSCREEN */}
       <AnimatePresence>
 
         {fullscreen && (
@@ -148,47 +178,47 @@ export default function CinematicGallery({
             exit={{
               opacity: 0,
             }}
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-6 backdrop-blur-2xl"
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-6 backdrop-blur-md"
           >
 
-            {/* Close */}
+            {/* CLOSE */}
             <button
               onClick={() =>
                 setFullscreen(false)
               }
-              className="absolute right-8 top-8 z-20 flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03]"
+              className="absolute right-8 top-8 z-20 flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md"
             >
 
               <X className="h-5 w-5 text-white/70" />
 
             </button>
 
-            {/* Previous */}
+            {/* PREVIOUS */}
             <button
               onClick={prevImage}
-              className="absolute left-8 z-20 flex h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03]"
+              className="absolute left-8 z-20 hidden h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md md:flex"
             >
 
               <ChevronLeft className="h-6 w-6 text-white/70" />
 
             </button>
 
-            {/* Next */}
+            {/* NEXT */}
             <button
               onClick={nextImage}
-              className="absolute right-8 z-20 flex h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03]"
+              className="absolute right-8 z-20 hidden h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md md:flex"
             >
 
               <ChevronRight className="h-6 w-6 text-white/70" />
 
             </button>
 
-            {/* Image */}
-            <motion.img
+            {/* FULLSCREEN IMAGE */}
+            <motion.div
               key={activeIndex}
               initial={{
                 opacity: 0,
-                scale: 0.96,
+                scale: 0.985,
               }}
               animate={{
                 opacity: 1,
@@ -196,16 +226,25 @@ export default function CinematicGallery({
               }}
               exit={{
                 opacity: 0,
-                scale: 0.96,
+                scale: 0.985,
               }}
               transition={{
-                duration: 0.7,
+                duration: 0.45,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              src={images[activeIndex]}
-              alt="Fullscreen Product"
-              className="max-h-[92vh] max-w-[92vw] rounded-[2rem] object-contain"
-            />
+              className="relative h-[92vh] w-[92vw]"
+            >
+
+              <Image
+                src={images[activeIndex]}
+                alt="Fullscreen Product"
+                fill
+                quality={92}
+                sizes="100vw"
+                className="rounded-[2rem] object-contain"
+              />
+
+            </motion.div>
 
           </motion.div>
         )}

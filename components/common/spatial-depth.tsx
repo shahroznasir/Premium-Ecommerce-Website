@@ -4,6 +4,7 @@ import {
   motion,
   useMotionValue,
   useSpring,
+  useTransform,
 } from "framer-motion";
 
 import {
@@ -20,9 +21,13 @@ interface SpatialDepthProps {
 
 export default function SpatialDepth({
   children,
-  intensity = 18,
+  intensity = 10,
   className,
 }: SpatialDepthProps) {
+
+  /* =========================================================
+     MOUSE POSITION
+  ========================================================== */
 
   const mouseX =
     useMotionValue(0);
@@ -30,17 +35,74 @@ export default function SpatialDepth({
   const mouseY =
     useMotionValue(0);
 
-  const rotateX =
-    useSpring(mouseY, {
-      stiffness: 120,
-      damping: 18,
+  /* =========================================================
+     CINEMATIC SMOOTHING
+  ========================================================== */
+
+  const smoothX =
+    useSpring(mouseX, {
+      stiffness: 65,
+      damping: 26,
+      mass: 1.2,
     });
 
-  const rotateY =
-    useSpring(mouseX, {
-      stiffness: 120,
-      damping: 18,
+  const smoothY =
+    useSpring(mouseY, {
+      stiffness: 65,
+      damping: 26,
+      mass: 1.2,
     });
+
+  /* =========================================================
+     REFINED ROTATION
+  ========================================================== */
+
+  const rotateY =
+    useTransform(
+      smoothX,
+      [-1, 1],
+      [-intensity, intensity]
+    );
+
+  const rotateX =
+    useTransform(
+      smoothY,
+      [-1, 1],
+      [intensity, -intensity]
+    );
+
+  /* =========================================================
+     SUBTLE DEPTH FLOAT
+  ========================================================== */
+
+  const translateY =
+    useTransform(
+      smoothY,
+      [-1, 1],
+      [-6, 6]
+    );
+
+  const translateX =
+    useTransform(
+      smoothX,
+      [-1, 1],
+      [-4, 4]
+    );
+
+  /* =========================================================
+     SCALE ATMOSPHERE
+  ========================================================== */
+
+  const scale =
+    useTransform(
+      smoothY,
+      [-1, 1],
+      [1.008, 0.995]
+    );
+
+  /* =========================================================
+     MOUSE TRACKING
+  ========================================================== */
 
   const handleMouseMove = (
     e: React.MouseEvent<HTMLDivElement>
@@ -50,46 +112,46 @@ export default function SpatialDepth({
       e.currentTarget.getBoundingClientRect();
 
     const x =
-      e.clientX - rect.left;
+      (e.clientX - rect.left) /
+      rect.width;
 
     const y =
-      e.clientY - rect.top;
+      (e.clientY - rect.top) /
+      rect.height;
 
-    const centerX =
-      rect.width / 2;
+    mouseX.set((x - 0.5) * 2);
+    mouseY.set((y - 0.5) * 2);
+  };
 
-    const centerY =
-      rect.height / 2;
+  const handleMouseLeave = () => {
 
-    mouseX.set(
-      ((x - centerX) / centerX) *
-        intensity
-    );
-
-    mouseY.set(
-      -(
-        ((y - centerY) / centerY) *
-        intensity
-      )
-    );
+    mouseX.set(0);
+    mouseY.set(0);
   };
 
   return (
     <motion.div
       onMouseMove={handleMouseMove}
-      onMouseLeave={() => {
-        mouseX.set(0);
-        mouseY.set(0);
-      }}
+      onMouseLeave={handleMouseLeave}
       style={{
         rotateX,
         rotateY,
-        transformStyle:
-          "preserve-3d",
+        x: translateX,
+        y: translateY,
+        scale,
+        transformStyle: "preserve-3d",
+        perspective: 2200,
+        willChange:
+          "transform",
+      }}
+      transition={{
+        duration: 1.2,
       }}
       className={className}
     >
+
       {children}
+
     </motion.div>
   );
 }

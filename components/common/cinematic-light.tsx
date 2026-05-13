@@ -9,102 +9,107 @@ import {
 import { useEffect } from "react";
 
 export default function CinematicLight() {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
 
-  /* Main Cinematic Glow */
-  const smoothX = useSpring(mouseX, {
-    damping: 45,
-    stiffness: 110,
-    mass: 0.8,
-  });
+  const mouseX =
+    useMotionValue(0);
 
-  const smoothY = useSpring(mouseY, {
-    damping: 45,
-    stiffness: 110,
-    mass: 0.8,
-  });
+  const mouseY =
+    useMotionValue(0);
 
-  /* Secondary Glow */
-  const secondaryX = useSpring(mouseX, {
-    damping: 60,
-    stiffness: 80,
-  });
+  /* =========================================================
+     OPTIMIZED SPRINGS
+  ========================================================== */
 
-  const secondaryY = useSpring(mouseY, {
-    damping: 60,
-    stiffness: 80,
-  });
+  const primaryX =
+    useSpring(mouseX, {
+      damping: 70,
+      stiffness: 55,
+      mass: 1.2,
+    });
 
-  /* Ambient Drift */
-  const ambientX = useSpring(mouseX, {
-    damping: 80,
-    stiffness: 50,
-  });
+  const primaryY =
+    useSpring(mouseY, {
+      damping: 70,
+      stiffness: 55,
+      mass: 1.2,
+    });
 
-  const ambientY = useSpring(mouseY, {
-    damping: 80,
-    stiffness: 50,
-  });
+  const ambientX =
+    useSpring(mouseX, {
+      damping: 90,
+      stiffness: 35,
+    });
+
+  const ambientY =
+    useSpring(mouseY, {
+      damping: 90,
+      stiffness: 35,
+    });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+
+    let raf = 0;
+
+    const handleMouseMove = (
+      e: MouseEvent
+    ) => {
+
+      cancelAnimationFrame(raf);
+
+      raf =
+        requestAnimationFrame(() => {
+
+          mouseX.set(e.clientX);
+          mouseY.set(e.clientY);
+
+        });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener(
+      "mousemove",
+      handleMouseMove,
+      { passive: true }
+    );
 
     return () => {
+
+      cancelAnimationFrame(raf);
+
       window.removeEventListener(
         "mousemove",
         handleMouseMove
       );
     };
+
   }, [mouseX, mouseY]);
 
   return (
     <>
-      {/* Main Gold Atmosphere */}
+
+      {/* =========================================================
+          PRIMARY CINEMATIC LIGHT
+      ========================================================== */}
       <motion.div
         style={{
-          left: smoothX,
-          top: smoothY,
+          left: primaryX,
+          top: primaryY,
           x: "-50%",
           y: "-50%",
         }}
         animate={{
-          opacity: [0.16, 0.24, 0.16],
-          scale: [1, 1.08, 1],
+          opacity: [0.045, 0.065, 0.045],
         }}
         transition={{
-          duration: 6,
+          duration: 10,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="pointer-events-none fixed z-[4] hidden h-[700px] w-[700px] rounded-full bg-[#B89B72]/[0.08] blur-[140px] md:block"
+        className="pointer-events-none fixed z-[2] hidden h-[360px] w-[360px] rounded-full bg-[#B89B72]/[0.07] blur-[90px] lg:block"
       />
 
-      {/* Secondary Soft Glow */}
-      <motion.div
-        style={{
-          left: secondaryX,
-          top: secondaryY,
-          x: "-50%",
-          y: "-50%",
-        }}
-        animate={{
-          opacity: [0.08, 0.14, 0.08],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="pointer-events-none fixed z-[3] hidden h-[420px] w-[420px] rounded-full bg-white/[0.04] blur-[120px] md:block"
-      />
-
-      {/* Ambient Cinematic Drift */}
+      {/* =========================================================
+          SOFT AMBIENT DEPTH
+      ========================================================== */}
       <motion.div
         style={{
           left: ambientX,
@@ -113,16 +118,16 @@ export default function CinematicLight() {
           y: "-50%",
         }}
         animate={{
-          opacity: [0.04, 0.08, 0.04],
-          scale: [1, 1.12, 1],
+          opacity: [0.018, 0.028, 0.018],
         }}
         transition={{
-          duration: 10,
+          duration: 14,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="pointer-events-none fixed z-[2] hidden h-[1000px] w-[1000px] rounded-full bg-[#B89B72]/[0.04] blur-[200px] md:block"
+        className="pointer-events-none fixed z-[1] hidden h-[620px] w-[620px] rounded-full bg-[#B89B72]/[0.035] blur-[120px] lg:block"
       />
+
     </>
   );
 }

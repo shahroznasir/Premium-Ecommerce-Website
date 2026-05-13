@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
@@ -23,7 +24,6 @@ interface ProductPageProps {
 }
 
 async function getProduct(slug: string) {
-
   const { data } = await supabase
     .from("products")
     .select("*")
@@ -36,7 +36,6 @@ async function getProduct(slug: string) {
 async function getRelatedProducts(
   category: string
 ) {
-
   const { data } = await supabase
     .from("products")
     .select("*")
@@ -64,15 +63,26 @@ export default async function ProductPage({
       product.category
     );
 
+  const gallery =
+    product.images?.length > 0
+      ? product.images
+      : [product.image];
+
   return (
     <>
       <Navbar />
 
       <main className="relative overflow-hidden bg-[#050505] text-white">
 
-        {/* =========================================================
-            TRACK
-        ========================================================== */}
+        {/* ATMOSPHERIC BACKGROUND */}
+        <ProductAtmosphere
+          category={product.category}
+        />
+
+        {/* PREMIUM GLOW */}
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[700px] w-[700px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.05] blur-[120px]" />
+
+        {/* TRACK PRODUCT */}
         <TrackProduct
           product={{
             id: product.id,
@@ -84,54 +94,34 @@ export default async function ProductPage({
           }}
         />
 
-        {/* =========================================================
-            DYNAMIC ATMOSPHERE
-        ========================================================== */}
-        <ProductAtmosphere
-          category={product.category}
-          title={product.title}
-        />
-
-        {/* =========================================================
-            HERO
-        ========================================================== */}
-        <section className="relative overflow-hidden pt-24 md:pt-32">
+        {/* HERO */}
+        <section className="relative overflow-hidden pt-32 md:pt-36">
 
           <div className="container-luxury relative z-10">
 
-            <div className="grid items-start gap-12 md:gap-16 xl:grid-cols-[1fr_0.85fr]">
+            <div className="grid gap-14 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
 
-              {/* =========================================================
-                  GALLERY
-              ========================================================== */}
+              {/* LEFT */}
               <ScrollNarrative>
 
-                <SpatialDepth intensity={10}>
+                <SpatialDepth intensity={2}>
 
-                  <div className="relative overflow-hidden rounded-[2rem] md:rounded-[2.8rem] border border-white/[0.06] bg-white/[0.02]">
+                  <div className="relative overflow-hidden rounded-[3rem] border border-white/[0.05] bg-gradient-to-b from-white/[0.03] to-white/[0.01] shadow-[0_0_60px_rgba(0,0,0,0.45)]">
 
                     {/* Reflection */}
-                    <div className="pointer-events-none absolute inset-y-0 left-[-20%] z-20 hidden w-[20%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent blur-3xl md:block" />
-
-                    {/* Ambient Glow */}
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,155,114,0.08),transparent_40%)] opacity-70" />
+                    <div className="pointer-events-none absolute inset-y-0 left-[-10%] z-20 hidden w-[18%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent blur-2xl md:block" />
 
                     {/* Gallery */}
                     <div className="relative z-10">
 
                       <CinematicGallery
-                        images={[
-                          product.image,
-                          product.image,
-                          product.image,
-                          product.image,
-                        ]}
+                        images={gallery}
                       />
 
                     </div>
 
-                    {/* Vignette */}
-                    <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] md:shadow-[inset_0_0_140px_rgba(0,0,0,0.42)]" />
+                    {/* Luxury Vignette */}
+                    <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
 
                   </div>
 
@@ -139,15 +129,13 @@ export default async function ProductPage({
 
               </ScrollNarrative>
 
-              {/* =========================================================
-                  PRODUCT STORY
-              ========================================================== */}
-              <div className="xl:sticky xl:top-28">
+              {/* RIGHT */}
+              <div className="xl:sticky xl:top-24">
 
-                {/* Category */}
+                {/* CATEGORY */}
                 <ScrollNarrative delay={0.05}>
 
-                  <p className="text-[9px] md:text-[10px] uppercase tracking-[0.42em] md:tracking-[0.48em] text-[#B89B72]/70">
+                  <p className="text-[10px] uppercase tracking-[0.55em] text-[#B89B72]/68">
 
                     {product.category}
 
@@ -155,11 +143,11 @@ export default async function ProductPage({
 
                 </ScrollNarrative>
 
-                {/* Title */}
+                {/* TITLE */}
                 <ScrollNarrative delay={0.1}>
 
                   <CinematicHeading
-                    className="mt-6 md:mt-8 max-w-[10ch] text-[3rem] leading-[0.88] tracking-[-0.08em] text-white md:text-[4.5rem] xl:text-[5.5rem] font-light"
+                    className="mt-5 max-w-[7ch] text-[4rem] font-light leading-[0.84] tracking-[-0.11em] text-white md:text-[5.4rem] xl:text-[5.9rem]"
                   >
 
                     {product.title}
@@ -168,35 +156,38 @@ export default async function ProductPage({
 
                 </ScrollNarrative>
 
-                {/* Divider */}
-                <ScrollNarrative delay={0.15}>
+                {/* SUBTITLE */}
+                <ScrollNarrative delay={0.14}>
 
-                  <div className="mt-8 md:mt-10 h-px w-16 md:w-20 bg-gradient-to-r from-[#B89B72] to-transparent" />
+                  <p className="mt-6 text-[10px] uppercase tracking-[0.46em] text-[#B89B72]/70">
 
-                </ScrollNarrative>
-
-                {/* Description */}
-                <ScrollNarrative delay={0.2}>
-
-                  <p className="mt-8 md:mt-10 max-w-[520px] text-[0.98rem] md:text-[1.02rem] leading-[1.95] md:leading-[2] text-white/50">
-
-                    {product.description}
+                    {product.subtitle}
 
                   </p>
 
                 </ScrollNarrative>
 
-                {/* Price */}
-                <ScrollNarrative delay={0.25}>
+                {/* DIVIDER */}
+                <div className="mt-8 h-px w-20 bg-gradient-to-r from-[#B89B72] to-transparent" />
 
-                  <div className="mt-10 md:mt-14">
+                {/* STORY */}
+                <ScrollNarrative delay={0.18}>
 
-                    <p className="text-[2.2rem] md:text-[2.7rem] font-light tracking-[-0.06em] text-white">
+                  <div className="mt-9 max-w-[520px] space-y-5">
 
-                      ₹
-                      {product.price.toLocaleString(
-                        "en-IN"
-                      )}
+                    <p className="text-[1rem] leading-[1.95] text-white/56">
+
+                      Architectural illuminated timepiece
+                      crafted to transform overlooked corners
+                      into cinematic focal points.
+
+                    </p>
+
+                    <p className="text-[0.92rem] leading-[1.9] text-white/34">
+
+                      Celestial artistry. Ambient illumination.
+                      Sculptural geometry designed for refined
+                      contemporary interiors.
 
                     </p>
 
@@ -204,10 +195,10 @@ export default async function ProductPage({
 
                 </ScrollNarrative>
 
-                {/* Actions */}
-                <ScrollNarrative delay={0.3}>
+                {/* PRODUCT ACTIONS */}
+                <ScrollNarrative delay={0.24}>
 
-                  <div className="mt-10 md:mt-14">
+                  <div className="mt-12">
 
                     <ProductActions
                       product={{
@@ -223,49 +214,49 @@ export default async function ProductPage({
 
                 </ScrollNarrative>
 
-                {/* Specs */}
-                <ScrollNarrative delay={0.35}>
+                {/* SPECS */}
+                <ScrollNarrative delay={0.3}>
 
-                  <div className="mt-14 md:mt-20 border-t border-white/[0.06] pt-8 md:pt-10">
+                  <div className="mt-12 grid gap-4 sm:grid-cols-3">
 
-                    <div className="grid gap-y-8 md:gap-y-10 sm:grid-cols-2">
+                    <LuxurySpec
+                      label="Dimensions"
+                      value={
+                        product.dimensions ||
+                        "Corner Mounted"
+                      }
+                    />
 
-                      <LuxurySpec
-                        label="Material"
-                        value="Premium Sculptural Resin"
-                      />
+                    <LuxurySpec
+                      label="Material"
+                      value={
+                        product.material ||
+                        "Illuminated Acrylic"
+                      }
+                    />
 
-                      <LuxurySpec
-                        label="Finish"
-                        value="Architectural Matte"
-                      />
-
-                      <LuxurySpec
-                        label="Dimensions"
-                        value="42 × 28 × 18 cm"
-                      />
-
-                      <LuxurySpec
-                        label="Craftsmanship"
-                        value="Hand Finished"
-                      />
-
-                    </div>
+                    <LuxurySpec
+                      label="Lighting"
+                      value={
+                        product.lighting ||
+                        "Warm Ambient LED"
+                      }
+                    />
 
                   </div>
 
                 </ScrollNarrative>
 
-                {/* Pills */}
-                <ScrollNarrative delay={0.4}>
+                {/* TAGS */}
+                <ScrollNarrative delay={0.34}>
 
-                  <div className="mt-10 md:mt-14 flex flex-wrap gap-3">
-
-                    <LuxuryPill text="White Glove Delivery" />
+                  <div className="mt-9 flex flex-wrap gap-3">
 
                     <LuxuryPill text="Limited Edition" />
 
-                    <LuxuryPill text="Curated Luxury Object" />
+                    <LuxuryPill text="Architectural Luxury" />
+
+                    <LuxuryPill text="Ambient Illumination" />
 
                   </div>
 
@@ -279,142 +270,56 @@ export default async function ProductPage({
 
         </section>
 
-        {/* =========================================================
-            EDITORIAL STORY
-        ========================================================== */}
+        {/* MONUMENTAL VISUAL */}
         <section className="relative py-24 md:py-36">
 
           <div className="container-luxury">
 
-            <div className="grid items-start gap-12 md:gap-20 lg:grid-cols-2">
+            <ScrollNarrative>
 
-              {/* Left */}
-              <div>
+              <div className="group relative overflow-hidden rounded-[3rem] border border-white/[0.05] shadow-[0_0_60px_rgba(0,0,0,0.45)]">
 
-                <ScrollNarrative>
+                <Image
+                  src={gallery[2]}
+                  alt={product.title}
+                  width={1800}
+                  height={1800}
+                  quality={85}
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="h-[72vh] w-full object-cover will-change-transform transform-gpu transition-transform duration-[2500ms] ease-out group-hover:scale-[1.02] md:h-[92vh]"
+                />
 
-                  <p className="text-[9px] md:text-[10px] uppercase tracking-[0.42em] md:tracking-[0.48em] text-[#B89B72]/70">
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
 
-                    Crafted Presence
+                {/* Vignette */}
+                <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
+
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 p-10 md:p-20">
+
+                  <p className="text-[10px] uppercase tracking-[0.48em] text-[#B89B72]/80">
+
+                    Architectural Presence
 
                   </p>
 
-                </ScrollNarrative>
-
-                <ScrollNarrative delay={0.1}>
-
                   <CinematicHeading
-                    className="mt-6 md:mt-8 text-4xl md:text-5xl font-light leading-[0.9] tracking-[-0.08em] text-white lg:text-6xl"
+                    className="mt-6 text-5xl font-light leading-[0.84] tracking-[-0.09em] text-white md:text-7xl"
                   >
 
                     Designed
                     <br />
                     Through
                     <br />
-                    Timeless
-                    <br />
-                    Materiality
+                    Atmosphere
 
                   </CinematicHeading>
 
-                </ScrollNarrative>
-
-              </div>
-
-              {/* Right */}
-              <div>
-
-                <ScrollNarrative delay={0.2}>
-
-                  <p className="max-w-[560px] text-[1rem] md:text-[1.05rem] leading-[2] md:leading-[2.1] text-white/50">
-
-                    Every sculptural detail is designed
-                    through balance, restraint,
-                    proportion, and atmospheric
-                    composition.
-
-                    <br />
-                    <br />
-
-                    The collection represents cinematic
-                    luxury through silence,
-                    craftsmanship, and timeless modern
-                    presence.
-
-                  </p>
-
-                </ScrollNarrative>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* =========================================================
-            MONUMENTAL IMAGE
-        ========================================================== */}
-        <section className="relative py-20 md:py-24">
-
-          <div className="container-luxury">
-
-            <ScrollNarrative>
-
-              <SpatialDepth intensity={8}>
-
-                <div className="group relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-white/[0.06]">
-
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="h-[60vh] md:h-[85vh] w-full object-cover transition-transform duration-[4000ms] ease-out group-hover:scale-[1.03]"
-                  />
-
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-                  {/* Vignette */}
-                  <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] md:shadow-[inset_0_0_140px_rgba(0,0,0,0.42)]" />
-
-                  {/* Ambient Glow */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,155,114,0.08),transparent_45%)] opacity-70" />
-
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 p-8 md:p-16">
-
-                    <ScrollNarrative delay={0.1}>
-
-                      <p className="text-[9px] md:text-[10px] uppercase tracking-[0.42em] md:tracking-[0.48em] text-[#B89B72]/80">
-
-                        Architectural Presence
-
-                      </p>
-
-                    </ScrollNarrative>
-
-                    <ScrollNarrative delay={0.2}>
-
-                      <CinematicHeading
-                        className="mt-5 md:mt-6 text-4xl md:text-5xl font-light leading-[0.88] tracking-[-0.08em] text-white lg:text-6xl"
-                      >
-
-                        Designed
-                        <br />
-                        Through
-                        <br />
-                        Silence
-
-                      </CinematicHeading>
-
-                    </ScrollNarrative>
-
-                  </div>
-
                 </div>
 
-              </SpatialDepth>
+              </div>
 
             </ScrollNarrative>
 
@@ -422,24 +327,17 @@ export default async function ProductPage({
 
         </section>
 
-        {/* =========================================================
-            RELATED PRODUCTS
-        ========================================================== */}
+        {/* RELATED */}
         <RelatedProducts
           products={relatedProducts.filter(
             (item) => item.id !== product.id
           )}
         />
 
-        {/* =========================================================
-            RECENTLY VIEWED
-        ========================================================== */}
+        {/* RECENTLY VIEWED */}
         <RecentlyViewed />
 
-        {/* =========================================================
-            SPACING
-        ========================================================== */}
-        <div className="h-16 md:h-24" />
+        <div className="h-20" />
 
       </main>
 
@@ -456,15 +354,15 @@ function LuxurySpec({
   value: string;
 }) {
   return (
-    <div>
+    <div className="rounded-[1.7rem] border border-white/[0.05] bg-white/[0.025] p-6 backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.04]">
 
-      <p className="text-[9px] md:text-[10px] uppercase tracking-[0.32em] md:tracking-[0.35em] text-white/30">
+      <p className="text-[10px] uppercase tracking-[0.38em] text-[#B89B72]/68">
 
         {label}
 
       </p>
 
-      <p className="mt-2 md:mt-3 text-base md:text-lg text-white/78">
+      <p className="mt-4 text-[14px] leading-relaxed text-white/72">
 
         {value}
 
@@ -480,7 +378,7 @@ function LuxuryPill({
   text: string;
 }) {
   return (
-    <div className="rounded-full border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 md:px-5 md:py-3 text-[9px] md:text-[10px] uppercase tracking-[0.32em] md:tracking-[0.35em] text-white/55 backdrop-blur-xl transition-all duration-500 hover:border-[#B89B72]/30 hover:bg-white/[0.05]">
+    <div className="rounded-[1.1rem] border border-white/[0.05] bg-white/[0.025] px-5 py-3 text-[10px] uppercase tracking-[0.34em] text-white/50 backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.04] hover:text-white/72">
 
       {text}
 

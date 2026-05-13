@@ -8,6 +8,7 @@ import Scene from "@/components/layout/scene";
 import { MOTION } from "@/lib/motion";
 
 import Hero from "@/sections/home/hero";
+import EditorialPause from "@/sections/home/editorial-pause";
 import Editorial from "@/sections/home/editorial";
 import Immersive from "@/sections/home/immersive";
 import EditorialTransition from "@/sections/home/editorial-transition";
@@ -37,16 +38,23 @@ export default function Home() {
       {/* =========================================================
           HERO EXPERIENCE
       ========================================================== */}
-      <Scene intensity={0.6}>
+      <Scene intensity={0.55}>
         <Section>
           <Hero />
         </Section>
       </Scene>
 
       {/* =========================================================
+          EDITORIAL SILENCE
+      ========================================================== */}
+      <Section>
+        <EditorialPause />
+      </Section>
+
+      {/* =========================================================
           EDITORIAL STORY
       ========================================================== */}
-      <Scene intensity={0.35}>
+      <Scene intensity={0.28}>
         <Section
           reveal
           bordered
@@ -59,7 +67,7 @@ export default function Home() {
       {/* =========================================================
           IMMERSIVE EXPERIENCE
       ========================================================== */}
-      <Scene intensity={0.45}>
+      <Scene intensity={0.38}>
         <Section
           reveal
           bordered
@@ -94,7 +102,7 @@ export default function Home() {
       {/* =========================================================
           COLLECTIONS
       ========================================================== */}
-      <Scene intensity={0.25}>
+      <Scene intensity={0.22}>
         <Section
           reveal
           bordered
@@ -107,7 +115,7 @@ export default function Home() {
       {/* =========================================================
           PARALLAX EXPERIENCE
       ========================================================== */}
-      <Scene intensity={0.3}>
+      <Scene intensity={0.25}>
         <Section
           reveal
           bordered
@@ -120,7 +128,7 @@ export default function Home() {
       {/* =========================================================
           CURATED SHOWCASE
       ========================================================== */}
-      <Scene intensity={0.4}>
+      <Scene intensity={0.32}>
         <Section
           reveal
           bordered
@@ -133,7 +141,7 @@ export default function Home() {
       {/* =========================================================
           HORIZONTAL STORYTELLING
       ========================================================== */}
-      <Scene intensity={0.45}>
+      <Scene intensity={0.36}>
         <Section
           reveal
           bordered
@@ -146,7 +154,7 @@ export default function Home() {
       {/* =========================================================
           SIGNATURE PIECE
       ========================================================== */}
-      <Scene intensity={0.35}>
+      <Scene intensity={0.28}>
         <Section
           reveal
           bordered
@@ -170,7 +178,7 @@ export default function Home() {
       {/* =========================================================
           FEATURED PRODUCTS
       ========================================================== */}
-      <Scene intensity={0.2}>
+      <Scene intensity={0.18}>
         <Section
           reveal
           bordered
@@ -189,7 +197,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#070707]/50 to-black" />
 
         {/* Ambient Glow */}
-        <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B89B72]/[0.03] blur-[180px]" />
+        <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B89B72]/[0.025] blur-[180px]" />
 
       </div>
 

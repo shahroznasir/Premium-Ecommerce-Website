@@ -4,6 +4,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from "framer-motion";
 
 import {
@@ -29,40 +30,103 @@ export default function CinematicHeading({
     useScroll({
       target: ref,
       offset: [
-        "start end",
-        "end start",
+        "start 92%",
+        "end 8%",
       ],
     });
 
-  const y = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [40, -40]
-  );
+  /* =========================================================
+     REFINED MOTION SYSTEM
+  ========================================================== */
 
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.3, 0.7, 1],
-    [0.4, 1, 1, 0.5]
-  );
+  const rawY =
+    useTransform(
+      scrollYProgress,
+      [0, 1],
+      [24, -16]
+    );
 
-  const scale = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    [0.96, 1, 1.02]
-  );
+  const rawOpacity =
+    useTransform(
+      scrollYProgress,
+      [0, 0.18, 0.82, 1],
+      [0.15, 1, 1, 0.78]
+    );
+
+  const rawScale =
+    useTransform(
+      scrollYProgress,
+      [0, 1],
+      [0.985, 1.01]
+    );
+
+  /* =========================================================
+     LUXURY SPRING SMOOTHING
+  ========================================================== */
+
+  const y =
+    useSpring(rawY, {
+      stiffness: 80,
+      damping: 26,
+      mass: 1,
+    });
+
+  const opacity =
+    useSpring(rawOpacity, {
+      stiffness: 70,
+      damping: 24,
+    });
+
+  const scale =
+    useSpring(rawScale, {
+      stiffness: 70,
+      damping: 22,
+    });
 
   return (
-    <motion.h2
-      ref={ref}
-      style={{
-        y,
-        opacity,
-        scale,
-      }}
-      className={className}
-    >
-      {children}
-    </motion.h2>
+    <div className="relative overflow-hidden">
+
+      {/* =========================================================
+          CINEMATIC REVEAL MASK
+      ========================================================== */}
+      <motion.div
+        initial={{
+          y: "0%",
+        }}
+        whileInView={{
+          y: "100%",
+        }}
+        viewport={{
+          once: true,
+          amount: 0.4,
+        }}
+        transition={{
+          duration: 1.4,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        className="absolute inset-0 z-20 bg-[#050505]"
+      />
+
+      {/* =========================================================
+          TYPOGRAPHY
+      ========================================================== */}
+      <motion.h2
+        ref={ref}
+        style={{
+          y,
+          opacity,
+          scale,
+        }}
+        transition={{
+          duration: 1.2,
+        }}
+        className={className}
+      >
+
+        {children}
+
+      </motion.h2>
+
+    </div>
   );
 }

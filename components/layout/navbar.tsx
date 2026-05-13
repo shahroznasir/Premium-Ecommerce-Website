@@ -77,32 +77,17 @@ export default function Navbar() {
     useCartUIStore();
 
   /* =========================================================
-     CINEMATIC NAVBAR EVOLUTION
+     ATMOSPHERIC NAVBAR MOTION
   ========================================================== */
 
   const navbarScale =
     useTransform(
-      () => 1 - progress * 0.02
+      () => 1 - progress * 0.01
     );
 
   const navbarY =
     useTransform(
-      () => progress * -5
-    );
-
-  const borderOpacity =
-    useTransform(
-      () => 0.08 + progress * 0.1
-    );
-
-  const glowOpacity =
-    useTransform(
-      () => 0.34 - progress * 0.12
-    );
-
-  const blurOpacity =
-    useTransform(
-      () => 0.7 + progress * 0.14
+      () => progress * -3
     );
 
   useMotionValueEvent(
@@ -143,7 +128,7 @@ export default function Navbar() {
           y:
             prefersReducedMotion
               ? 0
-              : -80,
+              : -50,
           opacity: 0,
         }}
         animate={{
@@ -158,59 +143,25 @@ export default function Navbar() {
           scale: navbarScale,
           y: navbarY,
         }}
-        className="fixed left-1/2 top-4 md:top-7 z-[9999] w-[94%] max-w-[1480px] -translate-x-1/2"
+        className="fixed left-1/2 top-4 md:top-6 z-[9999] w-[94%] max-w-[1460px] -translate-x-1/2"
       >
 
         {/* =========================================================
-            CINEMATIC SHELL
+            SHELL
         ========================================================== */}
-        <motion.div
-          style={{
-            opacity: blurOpacity,
-          }}
-          className={`relative overflow-hidden rounded-full border transition-all duration-700 ${
+        <div
+          className={`relative overflow-hidden rounded-[2rem] border transition-all duration-700 ${
             scrolled
-              ? "border-white/[0.14] bg-[#0A0A0A]/82 shadow-[0_20px_80px_rgba(0,0,0,0.52)] backdrop-blur-[18px] md:backdrop-blur-[28px]"
-              : "border-white/[0.1] bg-[#0A0A0A]/72 shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur-[14px] md:backdrop-blur-[22px]"
+              ? "border-white/[0.05] bg-black/22 backdrop-blur-md"
+              : "border-white/[0.04] bg-black/12 backdrop-blur-sm"
           }`}
         >
 
-          {/* Floating Aura */}
-          <motion.div
-            style={{
-              opacity: glowOpacity,
-            }}
-            className="pointer-events-none absolute inset-0 rounded-full shadow-[0_0_90px_rgba(0,0,0,0.38)]"
-          />
+          {/* Subtle Reflection */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent" />
 
-          {/* Premium Reflection */}
-          <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/[0.12] via-white/[0.03] to-transparent opacity-60" />
-
-          {/* Gold Edge Glow */}
-          <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#B89B72]/[0.12] via-transparent to-[#B89B72]/[0.12]" />
-
-          {/* Moving Reflection */}
-          {!prefersReducedMotion && (
-            <motion.div
-              animate={{
-                x: ["-120%", "120%"],
-              }}
-              transition={{
-                duration: 22,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="pointer-events-none absolute inset-y-0 hidden w-[24%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent blur-2xl md:block"
-            />
-          )}
-
-          {/* Inner Border */}
-          <motion.div
-            style={{
-              opacity: borderOpacity,
-            }}
-            className="pointer-events-none absolute inset-[1px] rounded-full border border-white/[0.06]"
-          />
+          {/* Atmospheric Edge */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
 
           {/* =========================================================
               CONTENT
@@ -218,8 +169,8 @@ export default function Navbar() {
           <div
             className={`relative flex items-center justify-between transition-all duration-700 ${
               scrolled
-                ? "h-[62px] px-5 md:h-[70px] md:px-7 lg:px-9"
-                : "h-[68px] px-5 md:h-[78px] md:px-8 lg:px-10"
+                ? "h-[62px] px-5 md:h-[68px] md:px-8"
+                : "h-[68px] px-5 md:h-[76px] md:px-9"
             }`}
           >
 
@@ -228,31 +179,14 @@ export default function Navbar() {
             ========================================================== */}
             <Link
               href="/"
-              className="group relative flex items-center gap-2.5 md:gap-3"
+              className="group flex items-center"
             >
 
-              {/* Luxury Dot */}
-              {!prefersReducedMotion && (
-                <motion.div
-                  animate={{
-                    opacity: [0.6, 1, 0.6],
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="h-[5px] w-[5px] rounded-full bg-[#D6C2A3] shadow-[0_0_14px_rgba(214,194,163,0.7)]"
-                />
-              )}
-
-              {/* Logo */}
               <span
-                className={`font-medium uppercase tracking-[0.22em] md:tracking-[0.34em] text-white transition duration-500 group-hover:text-[#D6C2A3] ${
+                className={`font-medium uppercase text-white transition duration-500 group-hover:text-[#D6C2A3] ${
                   scrolled
-                    ? "text-[9px] md:text-[10px]"
-                    : "text-[9px] md:text-[11px]"
+                    ? "text-[9px] tracking-[0.32em] md:text-[10px]"
+                    : "text-[9px] tracking-[0.38em] md:text-[11px]"
                 }`}
               >
 
@@ -265,22 +199,18 @@ export default function Navbar() {
             {/* =========================================================
                 NAVIGATION
             ========================================================== */}
-            <nav className="hidden items-center gap-9 lg:flex">
+            <nav className="hidden items-center gap-10 lg:flex">
 
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group relative overflow-hidden text-[10px] uppercase tracking-[0.22em] text-white/68 transition duration-500 hover:text-white"
+                  className="group relative text-[10px] uppercase tracking-[0.24em] text-white/58 transition duration-500 hover:text-white"
                 >
 
-                  <span className="relative z-10">
+                  {link.name}
 
-                    {link.name}
-
-                  </span>
-
-                  <span className="absolute bottom-[-6px] left-0 h-px w-0 bg-[#D6C2A3] transition-all duration-700 group-hover:w-full" />
+                  <span className="absolute -bottom-2 left-0 h-px w-0 bg-[#D6C2A3] transition-all duration-700 group-hover:w-full" />
 
                 </Link>
               ))}
@@ -290,26 +220,22 @@ export default function Navbar() {
             {/* =========================================================
                 RIGHT SIDE
             ========================================================== */}
-            <div className="flex items-center gap-2.5 md:gap-3 lg:gap-4">
+            <div className="flex items-center gap-2 md:gap-3">
 
               {/* Consultation */}
               <motion.button
                 whileHover={{
                   y: -1,
-                  scale: 1.01,
                 }}
                 transition={{
                   duration: 0.25,
                 }}
-                className="hidden rounded-full border border-white/[0.08] bg-white/[0.04] px-5 py-2.5 text-[10px] uppercase tracking-[0.28em] text-white/88 backdrop-blur-xl transition duration-500 hover:border-[#D6C2A3] hover:bg-[#D6C2A3] hover:text-black xl:block"
+                className="hidden rounded-[1.1rem] border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-white/85 transition duration-500 hover:border-[#D6C2A3]/40 hover:bg-white/[0.06] xl:block"
               >
 
                 Consultation
 
               </motion.button>
-
-              {/* Divider */}
-              <div className="hidden h-5 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent xl:block" />
 
               {/* Search */}
               <LuxuryIconButton
@@ -318,7 +244,7 @@ export default function Navbar() {
                 }
               >
 
-                <Search className="h-[14px] w-[14px] text-white/82 transition duration-500 group-hover:text-[#D6C2A3]" />
+                <Search className="h-[14px] w-[14px] text-white/75 transition duration-500 group-hover:text-[#D6C2A3]" />
 
               </LuxuryIconButton>
 
@@ -327,7 +253,7 @@ export default function Navbar() {
                 onClick={openCart}
               >
 
-                <ShoppingBag className="h-[14px] w-[14px] text-white/82 transition duration-500 group-hover:text-[#D6C2A3]" />
+                <ShoppingBag className="h-[14px] w-[14px] text-white/75 transition duration-500 group-hover:text-[#D6C2A3]" />
 
                 {getTotalItems() > 0 && (
                   <motion.div
@@ -337,7 +263,7 @@ export default function Navbar() {
                     animate={{
                       scale: 1,
                     }}
-                    className="absolute -right-1 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full border border-black/20 bg-[#D6C2A3] px-1 text-[8px] font-semibold text-black shadow-[0_0_20px_rgba(214,194,163,0.55)]"
+                    className="absolute -right-1 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#D6C2A3] px-1 text-[8px] font-semibold text-black"
                   >
 
                     {getTotalItems()}
@@ -354,7 +280,7 @@ export default function Navbar() {
                 }
               >
 
-                <div className="relative z-10 flex flex-col gap-[4px]">
+                <div className="flex flex-col gap-[4px]">
 
                   <span className="h-px w-4 bg-white transition duration-500 group-hover:bg-[#D6C2A3]" />
 
@@ -368,7 +294,7 @@ export default function Navbar() {
 
           </div>
 
-        </motion.div>
+        </div>
 
       </motion.header>
     </>
@@ -387,16 +313,15 @@ function LuxuryIconButton({
     <motion.button
       whileHover={{
         y: -1,
-        scale: 1.02,
       }}
       whileTap={{
-        scale: 0.97,
+        scale: 0.98,
       }}
       transition={{
-        duration: 0.22,
+        duration: 0.2,
       }}
       onClick={onClick}
-      className="group relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center overflow-hidden rounded-full border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl transition duration-500 hover:border-[#D6C2A3]"
+      className="group relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center overflow-hidden rounded-[1rem] border border-white/[0.05] bg-white/[0.03] transition duration-500 hover:border-[#D6C2A3]/40 hover:bg-white/[0.05]"
     >
 
       {children}

@@ -5,6 +5,11 @@ import {
   useReducedMotion,
 } from "framer-motion";
 
+import {
+  useEffect,
+  useRef,
+} from "react";
+
 import MagneticButton from "@/components/common/magnetic-button";
 
 export default function Hero() {
@@ -12,8 +17,58 @@ export default function Hero() {
   const prefersReducedMotion =
     useReducedMotion();
 
+  /* =========================================================
+     VIDEO PERFORMANCE OPTIMIZATION
+  ========================================================== */
+
+  const videoRef =
+    useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+
+    let timeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+
+      if (!videoRef.current)
+        return;
+
+      /* Force efficient GPU compositing */
+      videoRef.current.style.willChange =
+        "transform";
+
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+
+        if (videoRef.current) {
+          videoRef.current.style.willChange =
+            "auto";
+        }
+
+      }, 120);
+    };
+
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      { passive: true }
+    );
+
+    return () => {
+
+      clearTimeout(timeout);
+
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+    };
+
+  }, []);
+
   return (
-    <section className="relative h-screen overflow-hidden bg-black">
+    <section className="relative h-screen overflow-hidden bg-[#050505]">
 
       {/* =========================================================
           VIDEO BACKGROUND
@@ -21,17 +76,17 @@ export default function Hero() {
       <div className="absolute inset-0">
 
         {/* Desktop Video */}
-        <div className="hidden h-full w-full md:block">
+        <div className="hidden h-full w-full lg:block">
 
           <video
-            key="luxury-video"
+            ref={videoRef}
             autoPlay
             muted
             loop
             playsInline
             preload="metadata"
             poster="/images/hero-poster.jpg"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover will-change-transform [transform:translateZ(0)]"
           >
 
             <source
@@ -43,8 +98,8 @@ export default function Hero() {
 
         </div>
 
-        {/* Mobile Poster */}
-        <div className="block h-full w-full md:hidden">
+        {/* Mobile / Tablet Poster */}
+        <div className="block h-full w-full lg:hidden">
 
           <img
             src="/images/hero-poster.jpg"
@@ -58,19 +113,14 @@ export default function Hero() {
       </div>
 
       {/* =========================================================
-          SINGLE CINEMATIC OVERLAY
+          SIMPLE PERFORMANCE OVERLAY
       ========================================================== */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-[#050505]/85" />
-
-      {/* =========================================================
-          ATMOSPHERIC TOP LIGHT
-      ========================================================== */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,155,114,0.07),transparent_42%)]" />
+      <div className="absolute inset-0 bg-black/45" />
 
       {/* =========================================================
           MAIN CONTENT
       ========================================================== */}
-      <div className="relative z-10 flex h-full items-center pt-24">
+      <div className="relative z-10 flex h-full items-center">
 
         <div className="container-luxury w-full">
 
@@ -80,23 +130,123 @@ export default function Hero() {
               y:
                 prefersReducedMotion
                   ? 0
-                  : 24,
+                  : 10,
             }}
             animate={{
               opacity: 1,
               y: 0,
             }}
             transition={{
-              duration: 0.9,
+              duration: 0.7,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="max-w-[720px] pl-6 md:pl-20"
+            className="max-w-[680px] px-6 md:px-16"
           >
 
-            {/* =========================================================
+            {/* =====================================================
                 LABEL
-            ========================================================== */}
+            ====================================================== */}
             <motion.p
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              transition={{
+                delay: 0.1,
+                duration: 0.5,
+              }}
+              className="mb-6 pl-1 text-[9px] uppercase tracking-[0.42em] text-[#B89B72]/80 md:text-[10px]"
+            >
+
+              Curated Luxury Living
+
+            </motion.p>
+
+            {/* =====================================================
+                HEADING
+            ====================================================== */}
+            <div className="overflow-hidden">
+
+              <motion.h1
+                initial={{
+                  opacity: 0,
+                  y:
+                    prefersReducedMotion
+                      ? 0
+                      : 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.85,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="text-[3rem] font-light leading-[0.92] tracking-[-0.075em] text-white md:text-[5.5rem]"
+              >
+
+                Timeless Luxury
+                <br />
+                Defined
+
+              </motion.h1>
+
+            </div>
+
+            {/* =====================================================
+                DIVIDER
+            ====================================================== */}
+            <motion.div
+              initial={{
+                width: 0,
+                opacity: 0,
+              }}
+              animate={{
+                width: 70,
+                opacity: 1,
+              }}
+              transition={{
+                delay: 0.35,
+                duration: 0.6,
+              }}
+              className="mt-7 h-px bg-[#B89B72]/70"
+            />
+
+            {/* =====================================================
+                DESCRIPTION
+            ====================================================== */}
+            <motion.div
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              transition={{
+                delay: 0.22,
+                duration: 0.7,
+              }}
+              className="mt-6 max-w-[500px]"
+            >
+
+              <p className="text-[15px] leading-[1.8] text-white/58 md:text-[16px]">
+
+                Discover sculptural décor,
+                cinematic interiors, and elevated
+                design objects curated for refined
+                contemporary living.
+
+              </p>
+
+            </motion.div>
+
+            {/* =====================================================
+                CTA BUTTONS
+            ====================================================== */}
+            <motion.div
               initial={{
                 opacity: 0,
                 y:
@@ -109,130 +259,21 @@ export default function Hero() {
                 y: 0,
               }}
               transition={{
-                delay: 0.12,
-                duration: 0.7,
+                delay: 0.32,
+                duration: 0.6,
               }}
-              className="mb-8 md:mb-10 pl-1 text-[9px] md:text-[11px] uppercase tracking-[0.45em] md:tracking-[0.55em] text-[#B89B72]/85"
-            >
-
-              Curated Luxury Living
-
-            </motion.p>
-
-            {/* =========================================================
-                MAIN HEADING
-            ========================================================== */}
-            <div className="overflow-hidden">
-
-              <motion.h1
-                initial={{
-                  y:
-                    prefersReducedMotion
-                      ? 0
-                      : 36,
-                }}
-                animate={{
-                  y: 0,
-                }}
-                transition={{
-                  duration: 1,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="text-[3.4rem] font-light leading-[0.9] tracking-[-0.065em] text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.4)] md:text-[6.1rem]"
-              >
-
-                Timeless Luxury
-                <br />
-                Defined
-
-              </motion.h1>
-
-            </div>
-
-            {/* =========================================================
-                DIVIDER
-            ========================================================== */}
-            <motion.div
-              initial={{
-                width: 0,
-                opacity: 0,
-              }}
-              animate={{
-                width: 90,
-                opacity: 1,
-              }}
-              transition={{
-                delay: 0.5,
-                duration: 0.8,
-              }}
-              className="mt-8 md:mt-10 h-px bg-gradient-to-r from-[#B89B72] to-transparent"
-            />
-
-            {/* =========================================================
-                DESCRIPTION
-            ========================================================== */}
-            <motion.div
-              initial={{
-                opacity: 0,
-                y:
-                  prefersReducedMotion
-                    ? 0
-                    : 16,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              transition={{
-                delay: 0.28,
-                duration: 0.85,
-              }}
-              className="mt-6 md:mt-8 max-w-[540px]"
-            >
-
-              <p className="text-[15px] leading-[1.9] text-white/58 md:text-[17px] md:leading-[2]">
-
-                Discover sculptural décor,
-                cinematic interiors, and elevated
-                design objects curated for refined
-                contemporary living and timeless
-                architectural spaces.
-
-              </p>
-
-            </motion.div>
-
-            {/* =========================================================
-                CTA BUTTONS
-            ========================================================== */}
-            <motion.div
-              initial={{
-                opacity: 0,
-                y:
-                  prefersReducedMotion
-                    ? 0
-                    : 14,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              transition={{
-                delay: 0.42,
-                duration: 0.8,
-              }}
-              className="mt-8 md:mt-10 flex flex-wrap gap-3 md:gap-4"
+              className="mt-8 flex flex-wrap gap-3"
             >
 
               {/* Primary */}
-              <MagneticButton className="rounded-full bg-gradient-to-b from-white to-[#E7E2DA] px-7 py-3.5 text-[10px] uppercase tracking-[0.32em] text-black transition duration-500 hover:bg-[#B89B72] hover:text-black md:px-8 md:py-4 md:text-[11px]">
+              <MagneticButton className="rounded-full bg-white px-7 py-3 text-[10px] uppercase tracking-[0.3em] text-black transition duration-500 hover:scale-[1.01]">
 
                 Explore Collection
 
               </MagneticButton>
 
               {/* Secondary */}
-              <MagneticButton className="rounded-full border border-white/10 bg-black/20 px-7 py-3.5 text-[10px] uppercase tracking-[0.32em] text-white transition duration-500 hover:border-white hover:bg-white hover:text-black md:px-8 md:py-4 md:text-[11px]">
+              <MagneticButton className="rounded-full border border-white/12 bg-white/[0.03] px-7 py-3 text-[10px] uppercase tracking-[0.3em] text-white transition duration-500 hover:border-white/30">
 
                 View Projects
 
@@ -247,41 +288,9 @@ export default function Hero() {
       </div>
 
       {/* =========================================================
-          FLOATING TYPOGRAPHY
+          SOFT BOTTOM BLEND
       ========================================================== */}
-      {!prefersReducedMotion && (
-        <motion.div
-          animate={{
-            y: [0, -3, 0],
-          }}
-          transition={{
-            duration: 16,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="pointer-events-none absolute bottom-[-6%] right-[-2%] hidden text-[18vw] font-light leading-none tracking-[-0.08em] text-white/[0.018] lg:block"
-        >
-
-          TDAS
-
-        </motion.div>
-      )}
-
-      {/* =========================================================
-          FILM GRAIN
-      ========================================================== */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.01] mix-blend-soft-light"
-        style={{
-          backgroundImage:
-            "url('https://grainy-gradients.vercel.app/noise.svg')",
-        }}
-      />
-
-      {/* =========================================================
-          BOTTOM FADE
-      ========================================================== */}
-      <div className="absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#050505] to-transparent md:h-48" />
+      <div className="absolute bottom-0 left-0 h-20 w-full bg-gradient-to-t from-[#050505] to-transparent" />
 
     </section>
   );

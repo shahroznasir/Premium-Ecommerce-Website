@@ -8,7 +8,7 @@ import {
 import "./globals.css";
 
 import SmoothScroll from "@/components/common/smooth-scroll";
-import PageTransition from "@/components/common/page-transition";
+import CinematicLight from "@/components/common/cinematic-light";
 
 import ExperienceShell from "@/components/layout/experience-shell";
 
@@ -40,38 +40,51 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
     >
+
       <body
         suppressHydrationWarning
         className={`${inter.variable} ${playfair.variable} overflow-x-hidden bg-[#050505] text-white antialiased`}
       >
 
-        {/* ================= RAZORPAY ================= */}
+        {/* =========================================================
+            RAZORPAY
+        ========================================================== */}
         <script
           src="https://checkout.razorpay.com/v1/checkout.js"
           async
         />
 
-        {/* ================= SMOOTH SCROLL ================= */}
+        {/* =========================================================
+            SMOOTH SCROLL
+        ========================================================== */}
         <SmoothScroll />
 
-        {/* ================= GLOBAL SCROLL TIMELINE ================= */}
+        {/* =========================================================
+            GLOBAL SCROLL TIMELINE
+        ========================================================== */}
         <ScrollProgressProvider />
 
-        {/* ================= GLOBAL EXPERIENCE ================= */}
+        {/* =========================================================
+            GLOBAL ATMOSPHERIC EXPERIENCE
+        ========================================================== */}
         <ExperienceShell />
 
-        {/* ================= PAGE EXPERIENCE ================= */}
-        <PageTransition>
+        {/* =========================================================
+            CINEMATIC LIGHT SYSTEM
+        ========================================================== */}
+        <CinematicLight />
 
-          <main className="relative z-10">
+        {/* =========================================================
+            MAIN EXPERIENCE
+        ========================================================== */}
+        <main className="relative z-10">
 
-            {children}
+          {children}
 
-          </main>
-
-        </PageTransition>
+        </main>
 
       </body>
+
     </html>
   );
 }
