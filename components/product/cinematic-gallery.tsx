@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface CinematicGalleryProps {
   images: string[];
@@ -28,6 +28,10 @@ export default function CinematicGallery({
 
   const [fullscreen, setFullscreen] =
     useState(false);
+
+  /* =========================================================
+     NAVIGATION
+  ========================================================== */
 
   const nextImage = () => {
     setActiveIndex((prev) =>
@@ -45,9 +49,50 @@ export default function CinematicGallery({
     );
   };
 
+  /* =========================================================
+     KEYBOARD NAVIGATION
+  ========================================================== */
+
+  useEffect(() => {
+
+    const handleKeyDown = (
+      e: KeyboardEvent
+    ) => {
+
+      if (!fullscreen) return;
+
+      if (e.key === "ArrowRight") {
+        nextImage();
+      }
+
+      if (e.key === "ArrowLeft") {
+        prevImage();
+      }
+
+      if (e.key === "Escape") {
+        setFullscreen(false);
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+    };
+
+  }, [fullscreen]);
+
   return (
     <>
-      {/* MAIN GALLERY */}
+      {/* =====================================================
+          MAIN GALLERY
+      ====================================================== */}
       <div className="relative">
 
         {/* MAIN IMAGE */}
@@ -56,11 +101,11 @@ export default function CinematicGallery({
           onClick={() =>
             setFullscreen(true)
           }
-          className="group relative cursor-zoom-in overflow-hidden rounded-[3rem]"
+          className="group relative cursor-zoom-in overflow-hidden rounded-[2rem] bg-[#080808] md:rounded-[3rem]"
         >
 
           {/* IMAGE */}
-          <div className="relative h-[760px] w-full overflow-hidden md:h-[900px]">
+          <div className="relative h-[420px] w-full overflow-hidden sm:h-[560px] md:h-[760px] lg:h-[900px]">
 
             <Image
               src={images[activeIndex]}
@@ -69,19 +114,22 @@ export default function CinematicGallery({
               priority
               quality={88}
               sizes="(max-width: 768px) 100vw, 55vw"
-              className="object-cover will-change-transform transform-gpu transition-transform duration-[2200ms] ease-out group-hover:scale-[1.02]"
+              className="object-cover will-change-transform transform-gpu transition-transform duration-[1600ms] ease-out md:group-hover:scale-[1.018]"
             />
 
           </div>
 
-          {/* OVERLAY */}
+          {/* SOFT OVERLAY */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
 
           {/* VIGNETTE */}
-          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.45)]" />
+          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.42)] md:shadow-[inset_0_0_120px_rgba(0,0,0,0.45)]" />
 
-          {/* ZOOM HINT */}
-          <div className="absolute bottom-8 right-8 rounded-full border border-white/[0.08] bg-black/30 px-5 py-3 text-[10px] uppercase tracking-[0.35em] text-white/80 backdrop-blur-md opacity-0 transition-all duration-500 group-hover:opacity-100">
+          {/* TOP GRADIENT */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/20 to-transparent" />
+
+          {/* EXPAND */}
+          <div className="absolute bottom-5 right-5 hidden rounded-full border border-white/[0.08] bg-black/30 px-5 py-3 text-[10px] uppercase tracking-[0.35em] text-white/80 backdrop-blur-md opacity-0 transition-all duration-500 group-hover:opacity-100 md:block">
 
             Expand View
 
@@ -89,11 +137,13 @@ export default function CinematicGallery({
 
         </motion.div>
 
-        {/* NAVIGATION */}
-        <div className="mt-6 flex items-center justify-between gap-5">
+        {/* =====================================================
+            NAVIGATION
+        ====================================================== */}
+        <div className="mt-5 flex items-center justify-between gap-4 md:mt-6">
 
           {/* THUMBNAILS */}
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
+          <div className="flex flex-1 gap-3 overflow-x-auto pb-2 scrollbar-none md:gap-4">
 
             {images.map(
               (image, index) => (
@@ -102,14 +152,14 @@ export default function CinematicGallery({
                   onClick={() =>
                     setActiveIndex(index)
                   }
-                  className={`group relative overflow-hidden rounded-[1.6rem] border transition-all duration-500 ${
+                  className={`group relative shrink-0 overflow-hidden rounded-[1.2rem] border transition-all duration-500 md:rounded-[1.5rem] ${
                     activeIndex === index
-                      ? "border-[#B89B72]/40"
+                      ? "border-[#B89B72]/40 shadow-[0_0_25px_rgba(184,155,114,0.15)]"
                       : "border-white/[0.06]"
                   }`}
                 >
 
-                  <div className="relative h-28 w-28 overflow-hidden">
+                  <div className="relative h-20 w-20 overflow-hidden bg-[#090909] sm:h-24 sm:w-24 md:h-28 md:w-28">
 
                     <Image
                       src={image}
@@ -117,7 +167,7 @@ export default function CinematicGallery({
                       fill
                       quality={75}
                       sizes="120px"
-                      className={`object-cover transition duration-700 group-hover:scale-[1.03] ${
+                      className={`object-cover transition duration-700 md:group-hover:scale-[1.03] ${
                         activeIndex === index
                           ? "scale-[1.02]"
                           : ""
@@ -126,9 +176,13 @@ export default function CinematicGallery({
 
                   </div>
 
-                  {/* ACTIVE GLOW */}
+                  {/* ACTIVE OVERLAY */}
                   {activeIndex === index && (
-                    <div className="pointer-events-none absolute inset-0 bg-[#B89B72]/[0.08]" />
+                    <>
+                      <div className="pointer-events-none absolute inset-0 bg-[#B89B72]/[0.08]" />
+
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-[#B89B72]" />
+                    </>
                   )}
 
                 </button>
@@ -142,7 +196,7 @@ export default function CinematicGallery({
 
             <button
               onClick={prevImage}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10 lg:h-14 lg:w-14"
             >
 
               <ChevronLeft className="h-5 w-5 text-white/70" />
@@ -151,7 +205,7 @@ export default function CinematicGallery({
 
             <button
               onClick={nextImage}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10 lg:h-14 lg:w-14"
             >
 
               <ChevronRight className="h-5 w-5 text-white/70" />
@@ -164,7 +218,9 @@ export default function CinematicGallery({
 
       </div>
 
-      {/* FULLSCREEN */}
+      {/* =====================================================
+          FULLSCREEN
+      ====================================================== */}
       <AnimatePresence>
 
         {fullscreen && (
@@ -178,7 +234,7 @@ export default function CinematicGallery({
             exit={{
               opacity: 0,
             }}
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-6 backdrop-blur-md"
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md md:p-6"
           >
 
             {/* CLOSE */}
@@ -186,7 +242,7 @@ export default function CinematicGallery({
               onClick={() =>
                 setFullscreen(false)
               }
-              className="absolute right-8 top-8 z-20 flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md"
+              className="absolute right-4 top-4 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] md:right-8 md:top-8 md:h-14 md:w-14"
             >
 
               <X className="h-5 w-5 text-white/70" />
@@ -196,7 +252,7 @@ export default function CinematicGallery({
             {/* PREVIOUS */}
             <button
               onClick={prevImage}
-              className="absolute left-8 z-20 hidden h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md md:flex"
+              className="absolute left-6 z-20 hidden h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] lg:flex"
             >
 
               <ChevronLeft className="h-6 w-6 text-white/70" />
@@ -206,14 +262,14 @@ export default function CinematicGallery({
             {/* NEXT */}
             <button
               onClick={nextImage}
-              className="absolute right-8 z-20 hidden h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md md:flex"
+              className="absolute right-6 z-20 hidden h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] lg:flex"
             >
 
               <ChevronRight className="h-6 w-6 text-white/70" />
 
             </button>
 
-            {/* FULLSCREEN IMAGE */}
+            {/* IMAGE */}
             <motion.div
               key={activeIndex}
               initial={{
@@ -229,10 +285,10 @@ export default function CinematicGallery({
                 scale: 0.985,
               }}
               transition={{
-                duration: 0.45,
+                duration: 0.35,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="relative h-[92vh] w-[92vw]"
+              className="relative h-[88vh] w-[94vw] md:h-[92vh] md:w-[92vw]"
             >
 
               <Image
@@ -241,7 +297,7 @@ export default function CinematicGallery({
                 fill
                 quality={92}
                 sizes="100vw"
-                className="rounded-[2rem] object-contain"
+                className="rounded-[1.5rem] object-contain md:rounded-[2rem]"
               />
 
             </motion.div>

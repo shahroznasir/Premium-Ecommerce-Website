@@ -80,7 +80,7 @@ export default async function ProductPage({
         />
 
         {/* PREMIUM GLOW */}
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[700px] w-[700px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.05] blur-[120px]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.05] blur-[100px] md:h-[700px] md:w-[700px] md:blur-[120px]" />
 
         {/* TRACK PRODUCT */}
         <TrackProduct
@@ -95,18 +95,18 @@ export default async function ProductPage({
         />
 
         {/* HERO */}
-        <section className="relative overflow-hidden pt-32 md:pt-36">
+        <section className="relative overflow-hidden pt-24 md:pt-36">
 
           <div className="container-luxury relative z-10">
 
-            <div className="grid gap-14 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
+            <div className="grid gap-10 md:gap-14 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
 
               {/* LEFT */}
               <ScrollNarrative>
 
                 <SpatialDepth intensity={2}>
 
-                  <div className="relative overflow-hidden rounded-[3rem] border border-white/[0.05] bg-gradient-to-b from-white/[0.03] to-white/[0.01] shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                  <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.05] bg-gradient-to-b from-white/[0.03] to-white/[0.01] shadow-[0_0_40px_rgba(0,0,0,0.35)] md:rounded-[3rem] md:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
 
                     {/* Reflection */}
                     <div className="pointer-events-none absolute inset-y-0 left-[-10%] z-20 hidden w-[18%] rotate-12 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent blur-2xl md:block" />
@@ -121,7 +121,7 @@ export default async function ProductPage({
                     </div>
 
                     {/* Luxury Vignette */}
-                    <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
+                    <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.45)] md:shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
 
                   </div>
 
@@ -135,7 +135,7 @@ export default async function ProductPage({
                 {/* CATEGORY */}
                 <ScrollNarrative delay={0.05}>
 
-                  <p className="text-[10px] uppercase tracking-[0.55em] text-[#B89B72]/68">
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-[#B89B72]/68 md:text-[10px] md:tracking-[0.55em]">
 
                     {product.category}
 
@@ -147,7 +147,7 @@ export default async function ProductPage({
                 <ScrollNarrative delay={0.1}>
 
                   <CinematicHeading
-                    className="mt-5 max-w-[7ch] text-[4rem] font-light leading-[0.84] tracking-[-0.11em] text-white md:text-[5.4rem] xl:text-[5.9rem]"
+                    className="mt-4 max-w-[8ch] text-[2.9rem] font-light leading-[0.9] tracking-[-0.09em] text-white sm:text-[3.5rem] md:mt-5 md:text-[5rem] md:leading-[0.84] xl:text-[5.9rem]"
                   >
 
                     {product.title}
@@ -159,7 +159,7 @@ export default async function ProductPage({
                 {/* SUBTITLE */}
                 <ScrollNarrative delay={0.14}>
 
-                  <p className="mt-6 text-[10px] uppercase tracking-[0.46em] text-[#B89B72]/70">
+                  <p className="mt-5 text-[9px] uppercase tracking-[0.42em] text-[#B89B72]/70 md:mt-6 md:text-[10px] md:tracking-[0.46em]">
 
                     {product.subtitle}
 
@@ -168,14 +168,14 @@ export default async function ProductPage({
                 </ScrollNarrative>
 
                 {/* DIVIDER */}
-                <div className="mt-8 h-px w-20 bg-gradient-to-r from-[#B89B72] to-transparent" />
+                <div className="mt-7 h-px w-16 bg-gradient-to-r from-[#B89B72] to-transparent md:mt-8 md:w-20" />
 
                 {/* STORY */}
                 <ScrollNarrative delay={0.18}>
 
-                  <div className="mt-9 max-w-[520px] space-y-5">
+                  <div className="mt-8 max-w-[520px] space-y-5 md:mt-9">
 
-                    <p className="text-[1rem] leading-[1.95] text-white/56">
+                    <p className="text-[0.95rem] leading-[1.9] text-white/56 md:text-[1rem] md:leading-[1.95]">
 
                       Architectural illuminated timepiece
                       crafted to transform overlooked corners
@@ -183,7 +183,7 @@ export default async function ProductPage({
 
                     </p>
 
-                    <p className="text-[0.92rem] leading-[1.9] text-white/34">
+                    <p className="text-[0.86rem] leading-[1.85] text-white/34 md:text-[0.92rem] md:leading-[1.9]">
 
                       Celestial artistry. Ambient illumination.
                       Sculptural geometry designed for refined
@@ -198,7 +198,7 @@ export default async function ProductPage({
                 {/* PRODUCT ACTIONS */}
                 <ScrollNarrative delay={0.24}>
 
-                  <div className="mt-12">
+                  <div className="mt-10 md:mt-12">
 
                     <ProductActions
                       product={{
@@ -217,7 +217,7 @@ export default async function ProductPage({
                 {/* SPECS */}
                 <ScrollNarrative delay={0.3}>
 
-                  <div className="mt-12 grid gap-4 sm:grid-cols-3">
+                  <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 md:mt-12">
 
                     <LuxurySpec
                       label="Dimensions"
@@ -250,7 +250,7 @@ export default async function ProductPage({
                 {/* TAGS */}
                 <ScrollNarrative delay={0.34}>
 
-                  <div className="mt-9 flex flex-wrap gap-3">
+                  <div className="mt-8 flex flex-wrap gap-3 md:mt-9">
 
                     <LuxuryPill text="Limited Edition" />
 
@@ -271,13 +271,13 @@ export default async function ProductPage({
         </section>
 
         {/* MONUMENTAL VISUAL */}
-        <section className="relative py-24 md:py-36">
+        <section className="relative py-20 md:py-36">
 
           <div className="container-luxury">
 
             <ScrollNarrative>
 
-              <div className="group relative overflow-hidden rounded-[3rem] border border-white/[0.05] shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+              <div className="group relative overflow-hidden rounded-[2rem] border border-white/[0.05] shadow-[0_0_40px_rgba(0,0,0,0.35)] md:rounded-[3rem] md:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
 
                 <Image
                   src={gallery[2]}
@@ -287,26 +287,26 @@ export default async function ProductPage({
                   quality={85}
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="h-[72vh] w-full object-cover will-change-transform transform-gpu transition-transform duration-[2500ms] ease-out group-hover:scale-[1.02] md:h-[92vh]"
+                  className="h-[48vh] w-full object-cover will-change-transform transform-gpu transition-transform duration-[2500ms] ease-out md:h-[92vh] md:group-hover:scale-[1.02]"
                 />
 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
 
                 {/* Vignette */}
-                <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
+                <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.45)] md:shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 p-10 md:p-20">
+                <div className="absolute bottom-0 left-0 p-6 sm:p-8 md:p-20">
 
-                  <p className="text-[10px] uppercase tracking-[0.48em] text-[#B89B72]/80">
+                  <p className="text-[9px] uppercase tracking-[0.42em] text-[#B89B72]/80 md:text-[10px] md:tracking-[0.48em]">
 
                     Architectural Presence
 
                   </p>
 
                   <CinematicHeading
-                    className="mt-6 text-5xl font-light leading-[0.84] tracking-[-0.09em] text-white md:text-7xl"
+                    className="mt-4 text-[2.6rem] font-light leading-[0.88] tracking-[-0.08em] text-white sm:text-[3.5rem] md:mt-6 md:text-7xl md:leading-[0.84]"
                   >
 
                     Designed
@@ -337,7 +337,7 @@ export default async function ProductPage({
         {/* RECENTLY VIEWED */}
         <RecentlyViewed />
 
-        <div className="h-20" />
+        <div className="h-16 md:h-20" />
 
       </main>
 
@@ -354,15 +354,15 @@ function LuxurySpec({
   value: string;
 }) {
   return (
-    <div className="rounded-[1.7rem] border border-white/[0.05] bg-white/[0.025] p-6 backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.04]">
+    <div className="rounded-[1.5rem] border border-white/[0.05] bg-white/[0.025] p-5 backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.04] md:rounded-[1.7rem] md:p-6">
 
-      <p className="text-[10px] uppercase tracking-[0.38em] text-[#B89B72]/68">
+      <p className="text-[9px] uppercase tracking-[0.34em] text-[#B89B72]/68 md:text-[10px] md:tracking-[0.38em]">
 
         {label}
 
       </p>
 
-      <p className="mt-4 text-[14px] leading-relaxed text-white/72">
+      <p className="mt-3 text-[13px] leading-relaxed text-white/72 md:mt-4 md:text-[14px]">
 
         {value}
 
@@ -378,7 +378,7 @@ function LuxuryPill({
   text: string;
 }) {
   return (
-    <div className="rounded-[1.1rem] border border-white/[0.05] bg-white/[0.025] px-5 py-3 text-[10px] uppercase tracking-[0.34em] text-white/50 backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.04] hover:text-white/72">
+    <div className="rounded-[1rem] border border-white/[0.05] bg-white/[0.025] px-4 py-3 text-[9px] uppercase tracking-[0.28em] text-white/50 backdrop-blur-md transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.04] hover:text-white/72 md:rounded-[1.1rem] md:px-5 md:text-[10px] md:tracking-[0.34em]">
 
       {text}
 

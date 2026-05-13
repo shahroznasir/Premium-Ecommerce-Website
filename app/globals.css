@@ -25,7 +25,7 @@
   --font-playfair: "Playfair Display", serif;
 
   /* =========================================
-     APPLE-STYLE SPACING SYSTEM
+     SPACING SYSTEM
   ========================================= */
 
   --section-spacing-xl: 160px;
@@ -39,7 +39,7 @@
   --content-spacing-sm: 16px;
 
   /* =========================================
-     PREMIUM RADIUS SYSTEM
+     RADIUS SYSTEM
   ========================================= */
 
   --radius-xl: 32px;
@@ -77,10 +77,13 @@
 
 html {
   scroll-behavior: smooth;
+
+  overflow-x: hidden;
 }
 
 body {
   background: var(--background);
+
   color: var(--foreground);
 
   font-family: var(--font-inter);
@@ -91,6 +94,18 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  cursor: default;
+}
+
+/* =========================================
+   GLOBAL RESET
+========================================= */
+
+* {
+  box-sizing: border-box;
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================================
@@ -121,7 +136,7 @@ p {
 ========================================= */
 
 .text-hero-luxury {
-  font-size: clamp(4rem, 8vw, 7rem);
+  font-size: clamp(3rem, 8vw, 7rem);
 
   line-height: 0.88;
 
@@ -131,7 +146,7 @@ p {
 }
 
 .text-display-luxury {
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(2.4rem, 6vw, 5rem);
 
   line-height: 0.92;
 
@@ -141,7 +156,7 @@ p {
 }
 
 .text-title-luxury {
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(1.8rem, 4vw, 3rem);
 
   line-height: 1;
 
@@ -183,7 +198,7 @@ p {
 ========================================= */
 
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -191,13 +206,13 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.1);
 
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(184,155,114,0.5);
+  background: rgba(184,155,114,0.45);
 }
 
 /* =========================================
@@ -223,6 +238,12 @@ p {
 @media (max-width: 768px) {
   .container-luxury {
     padding-inline: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container-luxury {
+    padding-inline: 16px;
   }
 }
 
@@ -275,7 +296,7 @@ p {
 .glass-luxury {
   background: rgba(255,255,255,0.03);
 
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(14px);
 
   border: 1px solid rgba(255,255,255,0.06);
 
@@ -285,7 +306,7 @@ p {
 .glass-luxury-soft {
   background: rgba(255,255,255,0.02);
 
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(10px);
 
   border: 1px solid rgba(255,255,255,0.04);
 }
@@ -320,7 +341,7 @@ p {
 
 .gold-glow {
   box-shadow:
-    0 0 80px rgba(
+    0 0 60px rgba(
       184,
       155,
       114,
@@ -334,24 +355,14 @@ p {
 
 .transition-luxury {
   transition:
-    all 500ms
+    all 450ms
     var(--transition-luxury);
 }
 
 .transition-slow-luxury {
   transition:
-    all 900ms
+    all 800ms
     var(--transition-luxury);
-}
-
-/* =========================================
-   GLOBAL RESET
-========================================= */
-
-* {
-  cursor: none;
-
-  box-sizing: border-box;
 }
 
 /* =========================================
@@ -365,6 +376,10 @@ video {
   transform: translateZ(0);
 
   backface-visibility: hidden;
+
+  user-select: none;
+
+  -webkit-user-drag: none;
 }
 
 /* =========================================
@@ -373,15 +388,15 @@ video {
 
 button {
   transition:
-    transform 0.5s
+    transform 0.45s
       var(--transition-luxury),
-    background 0.5s
+    background 0.45s
       var(--transition-luxury),
-    border-color 0.5s
+    border-color 0.45s
       var(--transition-luxury),
-    color 0.5s
+    color 0.45s
       var(--transition-luxury),
-    opacity 0.5s
+    opacity 0.45s
       var(--transition-luxury);
 }
 
@@ -403,4 +418,43 @@ a {
 
 .text-balance {
   text-wrap: balance;
+}
+
+/* =========================================
+   SCROLLBAR HIDE
+========================================= */
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+
+  scrollbar-width: none;
+}
+
+/* =========================================
+   MOBILE OPTIMIZATION
+========================================= */
+
+@media (max-width: 768px) {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 0.95;
+  }
+
+  p {
+    line-height: 1.8;
+  }
+
+  .glass-luxury,
+  .glass-luxury-soft {
+    backdrop-filter: blur(10px);
+  }
 }
