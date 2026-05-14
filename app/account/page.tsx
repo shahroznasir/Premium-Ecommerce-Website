@@ -1,8 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { useRouter } from "next/navigation";
 
 import { motion } from "framer-motion";
+
+import { createClient } from "@supabase/supabase-js";
 
 import {
   ShoppingBag,
@@ -11,43 +18,209 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const orders = [
-  {
-    id: "#TDAS-2048",
-    item: "Aurelius Wall Clock",
-    status: "Preparing",
-    total: "₹1,24,999",
-  },
-  {
-    id: "#TDAS-2041",
-    item: "Architectural Lamp",
-    status: "Delivered",
-    total: "₹84,999",
-  },
-];
+/* =========================================================
+   TYPES
+========================================================== */
 
-const wishlist = [
-  {
-    title: "Sculptural Accent Chair",
-    category: "Furniture",
-  },
-  {
-    title: "Obsidian Table Lamp",
-    category: "Lighting",
-  },
-];
+type Order = {
+  id: string;
+  order_number: string;
+  total: number;
+  fulfillment_status: string;
+  tracking_status?: string;
+};
+
+type UserData = {
+  email?: string;
+  user_metadata?: {
+    full_name?: string;
+  };
+};
+
+/* =========================================================
+   SUPABASE
+========================================================== */
+
+const supabase =
+  createClient(
+    process.env
+      .NEXT_PUBLIC_SUPABASE_URL!,
+
+    process.env
+      .NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+/* =========================================================
+   ACCOUNT PAGE
+========================================================== */
 
 export default function AccountPage() {
+
+  const router =
+    useRouter();
+
+  const [user, setUser] =
+    useState<UserData | null>(
+      null
+    );
+
+  const [orders, setOrders] =
+    useState<Order[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    activeTab,
+    setActiveTab,
+  ] = useState(
+    "overview"
+  );
+
+  /* =======================================================
+     LOAD ACCOUNT
+  ======================================================== */
+
+  useEffect(() => {
+
+    async function loadAccount() {
+
+      const {
+        data: {
+          user,
+        },
+      } =
+        await supabase.auth.getUser();
+
+      if (!user) {
+
+        router.push(
+          "/login"
+        );
+
+        return;
+      }
+
+      setUser({
+        email: user.email,
+        user_metadata:
+          user.user_metadata,
+      });
+
+      const {
+        data,
+      } = await supabase
+        .from("orders")
+        .select("*")
+        .eq(
+          "email",
+          user.email
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
+        );
+
+      setOrders(
+        (data as Order[]) ||
+          []
+      );
+
+      setLoading(false);
+
+      /* ===================================================
+         REALTIME SYNC
+      ==================================================== */
+
+      const channel =
+        supabase
+          .channel(
+            `account-${user.email}`
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "orders",
+            },
+            (
+              payload
+            ) => {
+
+              setOrders(
+                (
+                  current
+                ) =>
+                  current.map(
+                    (
+                      order
+                    ) =>
+                      order.id ===
+                      payload.new.id
+                        ? {
+                            ...order,
+                            ...payload.new,
+                          }
+                        : order
+                  )
+              );
+            }
+          )
+          .subscribe();
+
+      return () => {
+
+        supabase.removeChannel(
+          channel
+        );
+      };
+    }
+
+    loadAccount();
+
+  }, [router]);
+
+  /* =======================================================
+     TOTAL SPENT
+  ======================================================== */
+
+  const totalSpent =
+    orders.reduce(
+      (
+        acc,
+        order
+      ) =>
+        acc +
+        Number(order.total),
+      0
+    );
+
+  /* =======================================================
+     LOADING
+  ======================================================== */
+
+  if (loading) {
+
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
+
+        Loading...
+
+      </main>
+    );
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
 
       {/* ================= ATMOSPHERE ================= */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
-        {/* Main Glow */}
         <div className="absolute left-1/2 top-[-10%] h-[1200px] w-[1200px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.04] blur-[220px]" />
 
-        {/* Right Glow */}
         <div className="absolute right-[-10%] top-[30%] h-[700px] w-[700px] rounded-full bg-[#B89B72]/[0.03] blur-[180px]" />
 
       </div>
@@ -70,7 +243,6 @@ export default function AccountPage() {
           className="mb-20 flex flex-col justify-between gap-10 lg:flex-row lg:items-end"
         >
 
-          {/* Left */}
           <div>
 
             <p className="text-[10px] uppercase tracking-[0.5em] text-[#B89B72]/80">
@@ -89,7 +261,6 @@ export default function AccountPage() {
 
           </div>
 
-          {/* Right */}
           <div className="max-w-md">
 
             <p className="text-lg leading-[2] text-white/45">
@@ -125,50 +296,83 @@ export default function AccountPage() {
 
             <div className="sticky top-10 overflow-hidden rounded-[2.5rem] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-3xl">
 
-              {/* Glow */}
               <div className="absolute right-[-10%] top-[-10%] h-[250px] w-[250px] rounded-full bg-[#B89B72]/10 blur-[120px]" />
 
               <div className="relative">
 
-                {/* Avatar */}
+                {/* AVATAR */}
                 <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#B89B72]/20 bg-[#B89B72]/10 text-2xl font-light text-[#B89B72]">
 
-                  T
+                  {
+                    user?.user_metadata
+                      ?.full_name?.[0] ||
+                    "L"
+                  }
 
                 </div>
 
-                {/* Name */}
+                {/* NAME */}
                 <h2 className="mt-8 text-3xl font-light tracking-[-0.05em] text-white">
 
-                  Tabish
+                  {
+                    user?.user_metadata
+                      ?.full_name ||
+                    "Luxury Client"
+                  }
 
                 </h2>
 
-                {/* Role */}
+                {/* ROLE */}
                 <p className="mt-3 text-[10px] uppercase tracking-[0.45em] text-white/35">
 
                   Private Collector
 
                 </p>
 
-                {/* Divider */}
+                {/* DIVIDER */}
                 <div className="my-10 h-px bg-white/[0.06]" />
 
-                {/* Navigation */}
+                {/* NAVIGATION */}
                 <div className="space-y-3">
 
                   <SidebarItem
-                    active
+                    active={
+                      activeTab ===
+                      "overview"
+                    }
+                    onClick={() =>
+                      setActiveTab(
+                        "overview"
+                      )
+                    }
                     icon={<User className="h-4 w-4" />}
                     label="Overview"
                   />
 
                   <SidebarItem
+                    active={
+                      activeTab ===
+                      "orders"
+                    }
+                    onClick={() =>
+                      setActiveTab(
+                        "orders"
+                      )
+                    }
                     icon={<ShoppingBag className="h-4 w-4" />}
                     label="Orders"
                   />
 
                   <SidebarItem
+                    active={
+                      activeTab ===
+                      "wishlist"
+                    }
+                    onClick={() =>
+                      setActiveTab(
+                        "wishlist"
+                      )
+                    }
                     icon={<Heart className="h-4 w-4" />}
                     label="Wishlist"
                   />
@@ -198,145 +402,188 @@ export default function AccountPage() {
             className="space-y-10"
           >
 
-            {/* ================= METRICS ================= */}
-            <div className="grid gap-6 md:grid-cols-3">
+            {/* ================= OVERVIEW / ORDERS ================= */}
+            {(activeTab ===
+              "overview" ||
+              activeTab ===
+                "orders") && (
+              <>
+                {/* METRICS */}
+                <div className="grid gap-6 md:grid-cols-3">
 
-              <MetricCard
-                label="Orders"
-                value="12"
-              />
+                  <MetricCard
+                    label="Orders"
+                    value={
+                      orders.length.toString()
+                    }
+                  />
 
-              <MetricCard
-                label="Wishlist"
-                value="08"
-              />
+                  <MetricCard
+                    label="Total Spent"
+                    value={`Rs. ${totalSpent.toLocaleString("en-IN")}`}
+                  />
 
-              <MetricCard
-                label="Collections"
-                value="04"
-              />
+                  <MetricCard
+                    label="Delivered"
+                    value={
+                      orders
+                        .filter(
+                          (
+                            order
+                          ) =>
+                            order.tracking_status ===
+                            "delivered"
+                        )
+                        .length.toString()
+                    }
+                  />
 
-            </div>
+                </div>
 
-            {/* ================= ORDERS ================= */}
-            <LuxuryCard
-              title="Recent Orders"
-            >
+                {/* ORDERS */}
+                <LuxuryCard
+                  title="Recent Orders"
+                >
 
-              <div className="space-y-5">
+                  <div className="space-y-5">
 
-                {orders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="group flex flex-col gap-6 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] p-6 transition duration-700 hover:border-[#B89B72]/20 md:flex-row md:items-center md:justify-between"
-                  >
+                    {orders.map(
+                      (order) => (
 
-                    {/* Left */}
-                    <div>
+                        <div
+                          key={order.id}
+                          className="group flex flex-col gap-6 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] p-6 transition duration-700 hover:border-[#B89B72]/20 md:flex-row md:items-center md:justify-between"
+                        >
 
-                      <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/70">
+                          <div>
 
-                        {order.id}
+                            <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/70">
 
-                      </p>
+                              {
+                                order.order_number
+                              }
 
-                      <h3 className="mt-4 text-2xl font-light tracking-[-0.04em] text-white">
+                            </p>
 
-                        {order.item}
+                            <h3 className="mt-4 text-2xl font-light tracking-[-0.04em] text-white">
 
-                      </h3>
+                              Order Purchase
 
-                    </div>
+                            </h3>
 
-                    {/* Right */}
-                    <div className="flex items-center gap-10">
+                          </div>
 
-                      <div>
+                          <div className="flex items-center gap-10">
 
-                        <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
+                            <div>
 
-                          Status
+                              <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
 
-                        </p>
+                                Status
 
-                        <p className="mt-3 text-white/70">
+                              </p>
 
-                          {order.status}
+                              <p className="mt-3 text-white/70">
+
+                                {
+                                  order.tracking_status ||
+                                  "processing"
+                                }
+
+                              </p>
+
+                            </div>
+
+                            <div>
+
+                              <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
+
+                                Total
+
+                              </p>
+
+                              <p className="mt-3 text-white">
+
+                                Rs.
+                                {Number(
+                                  order.total
+                                ).toLocaleString(
+                                  "en-IN"
+                                )}
+
+                              </p>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                router.push(
+                                  `/account/orders/${order.id}`
+                                );
+                              }}
+                              className="relative z-50 flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] transition duration-700 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10"
+                            >
+
+                              <ArrowRight className="h-4 w-4 text-white/70" />
+
+                            </button>
+
+                          </div>
+
+                        </div>
+
+                      )
+                    )}
+
+                    {/* EMPTY */}
+                    {orders.length === 0 && (
+
+                      <div className="rounded-[2rem] border border-white/[0.06] bg-white/[0.02] px-8 py-20 text-center">
+
+                        <p className="text-2xl font-light text-white/55">
+
+                          No orders yet.
 
                         </p>
 
                       </div>
 
-                      <div>
-
-                        <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
-
-                          Total
-
-                        </p>
-
-                        <p className="mt-3 text-white">
-
-                          {order.total}
-
-                        </p>
-
-                      </div>
-
-                      <button className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] transition duration-700 hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10">
-
-                        <ArrowRight className="h-4 w-4 text-white/70" />
-
-                      </button>
-
-                    </div>
+                    )}
 
                   </div>
-                ))}
 
-              </div>
-
-            </LuxuryCard>
+                </LuxuryCard>
+              </>
+            )}
 
             {/* ================= WISHLIST ================= */}
-            <LuxuryCard
-              title="Saved Collections"
-            >
+            {activeTab ===
+              "wishlist" && (
 
-              <div className="grid gap-5 md:grid-cols-2">
+              <LuxuryCard
+                title="Saved Collections"
+              >
 
-                {wishlist.map((item) => (
-                  <div
-                    key={item.title}
-                    className="group overflow-hidden rounded-[2rem] border border-white/[0.06] bg-white/[0.03] p-6 transition duration-700 hover:border-[#B89B72]/20"
-                  >
+                <div className="rounded-[2rem] border border-white/[0.06] bg-white/[0.02] px-8 py-20 text-center">
 
-                    <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/70">
+                  <p className="text-3xl font-light text-white">
 
-                      {item.category}
+                    Wishlist Coming Soon
 
-                    </p>
+                  </p>
 
-                    <h3 className="mt-6 text-3xl font-light leading-[1] tracking-[-0.05em] text-white">
+                  <p className="mt-6 text-white/45">
 
-                      {item.title}
+                    Save your luxury selections and curate your private collection.
 
-                    </h3>
+                  </p>
 
-                    <button className="mt-10 flex items-center gap-3 text-[10px] uppercase tracking-[0.35em] text-white/40 transition duration-500 hover:text-[#B89B72]">
+                </div>
 
-                      View Object
+              </LuxuryCard>
 
-                      <ArrowRight className="h-3 w-3" />
-
-                    </button>
-
-                  </div>
-                ))}
-
-              </div>
-
-            </LuxuryCard>
+            )}
 
           </motion.div>
 
@@ -354,13 +601,17 @@ function SidebarItem({
   label,
   icon,
   active,
+  onClick,
 }: {
   label: string;
   icon: React.ReactNode;
   active?: boolean;
+  onClick?: () => void;
 }) {
+
   return (
     <button
+      onClick={onClick}
       className={`flex w-full items-center gap-4 rounded-full px-5 py-4 text-left transition duration-700 ${
         active
           ? "border border-[#B89B72]/20 bg-[#B89B72]/10 text-white"
@@ -389,6 +640,7 @@ function LuxuryCard({
   title: string;
   children: React.ReactNode;
 }) {
+
   return (
     <div className="overflow-hidden rounded-[2.5rem] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-3xl">
 
@@ -417,6 +669,7 @@ function MetricCard({
   label: string;
   value: string;
 }) {
+
   return (
     <div className="overflow-hidden rounded-[2rem] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-3xl">
 

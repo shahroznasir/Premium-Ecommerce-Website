@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 export default function CheckoutSuccessPage() {
 
   /* =========================================================
-     SAFE ORDER REFERENCE
+     GET ORDER NUMBER
   ========================================================== */
 
-  const orderReference =
-    `TDAS-${crypto.randomUUID()
-      .slice(0, 8)
-      .toUpperCase()}`;
+  const searchParams =
+    useSearchParams();
+
+  const orderNumber =
+    searchParams.get("order");
 
   return (
     <main className="relative flex min-h-screen overflow-hidden bg-[#050505] text-white">
@@ -238,18 +240,19 @@ export default function CheckoutSuccessPage() {
               {/* Top */}
               <div className="flex flex-col gap-8 border-b border-white/[0.06] pb-8 md:flex-row md:items-center md:justify-between">
 
-                {/* Order ID */}
+                {/* Order Number */}
                 <div>
 
                   <p className="text-[10px] uppercase tracking-[0.45em] text-white/35">
 
-                    Order Reference
+                    Order Number
 
                   </p>
 
                   <p className="mt-4 text-2xl font-light tracking-[-0.04em] text-white md:text-3xl">
 
-                    {orderReference}
+                    {orderNumber ||
+                      "TDAS-2026-0000"}
 
                   </p>
 
