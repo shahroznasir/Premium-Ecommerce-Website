@@ -39,6 +39,33 @@ export async function POST(
 
   try {
 
+    /* =====================================================
+       VALIDATE SECRET
+    ====================================================== */
+
+    const apiKey =
+      request.headers.get(
+        "x-api-key"
+      );
+
+    if (
+      apiKey !==
+      process.env
+        .SHIPROCKET_WEBHOOK_SECRET
+    ) {
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Unauthorized",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
     const body =
       await request.json();
 
@@ -173,6 +200,10 @@ export async function POST(
         }
       );
     }
+
+    /* =====================================================
+       SUCCESS
+    ====================================================== */
 
     return NextResponse.json({
       success: true,
