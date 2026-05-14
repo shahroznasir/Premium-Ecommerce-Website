@@ -22,6 +22,7 @@ import {
   ExternalLink,
   Clock3,
   MapPin,
+  CalendarDays,
 } from "lucide-react";
 
 /* =========================================================
@@ -53,6 +54,7 @@ type Order = {
   courier_name?: string;
   awb_code?: string;
   tracking_url?: string;
+  estimated_delivery?: string;
   tracking_events?: TrackingEvent[];
   created_at: string;
   customer_name?: string;
@@ -333,7 +335,7 @@ export default function OrderDetailsPage() {
           {(order.awb_code ||
             order.courier_name) && (
 
-            <div className="mt-14 grid gap-6 md:grid-cols-2">
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
 
               <InfoCard
                 label="Courier Partner"
@@ -348,6 +350,24 @@ export default function OrderDetailsPage() {
                 value={
                   order.awb_code ||
                   "Pending"
+                }
+              />
+
+              <InfoCard
+                label="Expected Delivery"
+                value={
+                  order.estimated_delivery
+                    ? new Date(
+                        order.estimated_delivery
+                      ).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        }
+                      )
+                    : "3-5 Business Days"
                 }
               />
 
@@ -419,7 +439,7 @@ export default function OrderDetailsPage() {
 
           </div>
 
-          {/* LIVE TRACKING EVENTS */}
+          {/* LIVE EVENTS */}
           {trackingEvents.length > 0 && (
 
             <div className="mt-20">
