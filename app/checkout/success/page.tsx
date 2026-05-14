@@ -1,20 +1,41 @@
 "use client";
 
 import Link from "next/link";
+
 import { motion } from "framer-motion";
-import { useSearchParams } from "next/navigation";
 
-export default function CheckoutSuccessPage() {
+import {
+  Suspense,
+} from "react";
 
-  /* =========================================================
+import {
+  useSearchParams,
+} from "next/navigation";
+
+/* =========================================================
+   FORCE DYNAMIC RENDERING
+========================================================== */
+
+export const dynamic =
+  "force-dynamic";
+
+/* =========================================================
+   SUCCESS CONTENT
+========================================================== */
+
+function SuccessContent() {
+
+  /* =======================================================
      GET ORDER NUMBER
-  ========================================================== */
+  ======================================================== */
 
   const searchParams =
     useSearchParams();
 
   const orderNumber =
-    searchParams.get("order");
+    searchParams.get(
+      "order"
+    );
 
   return (
     <main className="relative flex min-h-screen overflow-hidden bg-[#050505] text-white">
@@ -378,5 +399,28 @@ export default function CheckoutSuccessPage() {
       </div>
 
     </main>
+  );
+}
+
+/* =========================================================
+   PAGE
+========================================================== */
+
+export default function CheckoutSuccessPage() {
+
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
+
+          Loading...
+
+        </main>
+      }
+    >
+
+      <SuccessContent />
+
+    </Suspense>
   );
 }
