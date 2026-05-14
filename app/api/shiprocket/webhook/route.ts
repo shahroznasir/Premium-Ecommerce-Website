@@ -17,7 +17,6 @@ const supabase =
 
 /* =========================================================
    GET
-   REQUIRED FOR SHIPROCKET VALIDATION
 ========================================================== */
 
 export async function GET() {
@@ -30,7 +29,7 @@ export async function GET() {
 }
 
 /* =========================================================
-   WEBHOOK
+   POST
 ========================================================== */
 
 export async function POST(
@@ -40,7 +39,7 @@ export async function POST(
   try {
 
     /* =====================================================
-       VALIDATE SECRET
+       AUTH VALIDATION
     ====================================================== */
 
     const apiKey =
@@ -66,8 +65,25 @@ export async function POST(
       );
     }
 
-    const body =
-      await request.json();
+    /* =====================================================
+       SAFE BODY PARSE
+    ====================================================== */
+
+    let body: Record<string, unknown> = {};
+
+    try {
+
+      body =
+        await request.json();
+
+    } catch {
+
+      return NextResponse.json({
+        success: true,
+        message:
+          "Webhook test received",
+      });
+    }
 
     console.log(
       "SHIPROCKET WEBHOOK:",
@@ -79,15 +95,31 @@ export async function POST(
     ====================================================== */
 
     const awb =
-      body?.awb;
+      body?.awb as string;
 
     const shipmentStatus =
-      body?.current_status
+      (body?.current_status as string)
         ?.toLowerCase()
         ?.replaceAll(
           " ",
           "_"
         );
+
+    /* =====================================================
+       TEST WEBHOOK
+    ====================================================== */
+
+    if (
+      !awb ||
+      !shipmentStatus
+    ) {
+
+      return NextResponse.json({
+        success: true,
+        message:
+          "Webhook received successfully",
+      });
+    }
 
     /* =====================================================
        MAP STATUS
@@ -97,7 +129,7 @@ export async function POST(
       "processing";
 
     if (
-      shipmentStatus?.includes(
+      shipmentStatus.includes(
         "packed"
       )
     ) {
@@ -107,7 +139,7 @@ export async function POST(
     }
 
     if (
-      shipmentStatus?.includes(
+      shipmentStatus.includes(
         "shipped"
       )
     ) {
@@ -117,7 +149,7 @@ export async function POST(
     }
 
     if (
-      shipmentStatus?.includes(
+      shipmentStatus.includes(
         "out_for_delivery"
       )
     ) {
@@ -127,7 +159,7 @@ export async function POST(
     }
 
     if (
-      shipmentStatus?.includes(
+      shipmentStatus.includes(
         "delivered"
       )
     ) {
@@ -171,7 +203,7 @@ export async function POST(
     }
 
     /* =====================================================
-       SEND CUSTOMER EMAIL
+       SEND EMAIL
     ====================================================== */
 
     if (order) {
@@ -201,10 +233,6 @@ export async function POST(
       );
     }
 
-    /* =====================================================
-       SUCCESS
-    ====================================================== */
-
     return NextResponse.json({
       success: true,
     });
@@ -212,12 +240,15 @@ export async function POST(
   } catch (error) {
 
     console.error(
+      "WEBHOOK ERROR:",
       error
     );
 
     return NextResponse.json(
       {
         success: false,
+        message:
+          "Webhook failed",
       },
       {
         status: 500,
