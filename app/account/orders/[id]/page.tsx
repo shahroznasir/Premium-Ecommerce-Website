@@ -18,6 +18,10 @@ import {
   Download,
   CheckCircle2,
   Circle,
+  Truck,
+  ExternalLink,
+  Clock3,
+  MapPin,
 } from "lucide-react";
 
 /* =========================================================
@@ -33,12 +37,23 @@ type OrderItem = {
   quantity?: number;
 };
 
+type TrackingEvent = {
+  location?: string;
+  date?: string;
+  activity?: string;
+  status?: string;
+};
+
 type Order = {
   id: string;
   order_number: string;
   total: number;
   fulfillment_status: string;
   tracking_status?: string;
+  courier_name?: string;
+  awb_code?: string;
+  tracking_url?: string;
+  tracking_events?: TrackingEvent[];
   created_at: string;
   customer_name?: string;
   email?: string;
@@ -80,7 +95,7 @@ export default function OrderDetailsPage() {
     useState(true);
 
   /* =======================================================
-     LOAD ORDER + REALTIME
+     LOAD ORDER
   ======================================================== */
 
   useEffect(() => {
@@ -109,10 +124,6 @@ export default function OrderDetailsPage() {
     }
 
     loadOrder();
-
-    /* =====================================================
-       REALTIME ORDER TRACKING
-    ====================================================== */
 
     const channel =
       supabase
@@ -183,6 +194,10 @@ export default function OrderDetailsPage() {
     order.fulfillment_status ||
     "processing";
 
+  const trackingEvents =
+    order.tracking_events ||
+    [];
+
   const statusColor =
     status === "delivered"
       ? "text-green-400 border-green-500/20 bg-green-500/10"
@@ -193,7 +208,7 @@ export default function OrderDetailsPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050505] px-6 py-20 text-white">
 
-      {/* ATMOSPHERE */}
+      {/* BACKGROUND */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
         <div className="absolute left-1/2 top-[-10%] h-[1000px] w-[1000px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.04] blur-[180px]" />
@@ -218,7 +233,7 @@ export default function OrderDetailsPage() {
 
         </button>
 
-        {/* MAIN CARD */}
+        {/* MAIN */}
         <div className="overflow-hidden rounded-[3rem] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-3xl md:p-12">
 
           {/* HEADER */}
@@ -228,7 +243,7 @@ export default function OrderDetailsPage() {
 
               <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
 
-                Order Details
+                Luxury Shipment
 
               </p>
 
@@ -261,7 +276,6 @@ export default function OrderDetailsPage() {
 
             <div className="flex flex-col items-start gap-5 md:items-end">
 
-              {/* STATUS */}
               <div
                 className={`inline-flex items-center gap-3 rounded-full border px-6 py-4 ${statusColor}`}
               >
@@ -270,13 +284,35 @@ export default function OrderDetailsPage() {
 
                 <span className="text-xs uppercase tracking-[0.3em]">
 
-                  {status}
+                  {status.replaceAll(
+                    "_",
+                    " "
+                  )}
 
                 </span>
 
               </div>
 
-              {/* INVOICE */}
+              {order.tracking_url && (
+
+                <a
+                  href={
+                    order.tracking_url
+                  }
+                  target="_blank"
+                  className="inline-flex items-center gap-3 rounded-full border border-[#B89B72]/20 bg-[#B89B72]/10 px-6 py-4 text-xs uppercase tracking-[0.3em] text-[#B89B72] transition hover:bg-[#B89B72] hover:text-black"
+                >
+
+                  <Truck className="h-4 w-4" />
+
+                  Track Shipment
+
+                  <ExternalLink className="h-4 w-4" />
+
+                </a>
+
+              )}
+
               <a
                 href={`/api/generate-invoice?orderId=${order.id}`}
                 target="_blank"
@@ -293,12 +329,38 @@ export default function OrderDetailsPage() {
 
           </div>
 
+          {/* LOGISTICS */}
+          {(order.awb_code ||
+            order.courier_name) && (
+
+            <div className="mt-14 grid gap-6 md:grid-cols-2">
+
+              <InfoCard
+                label="Courier Partner"
+                value={
+                  order.courier_name ||
+                  "Assigned Soon"
+                }
+              />
+
+              <InfoCard
+                label="AWB Number"
+                value={
+                  order.awb_code ||
+                  "Pending"
+                }
+              />
+
+            </div>
+
+          )}
+
           {/* TIMELINE */}
           <div className="mt-20">
 
             <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
 
-              Order Timeline
+              Shipment Timeline
 
             </p>
 
@@ -357,198 +419,104 @@ export default function OrderDetailsPage() {
 
           </div>
 
-          {/* PRODUCTS */}
-          <div className="mt-20">
+          {/* LIVE TRACKING EVENTS */}
+          {trackingEvents.length > 0 && (
 
-            <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
+            <div className="mt-20">
 
-              Ordered Products
+              <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/80">
 
-            </p>
+                Live Shipment Activity
 
-            <div className="mt-10 space-y-6">
+              </p>
 
-              {order.items?.map(
-                (
-                  item,
-                  index
-                ) => (
+              <div className="mt-10 space-y-6">
 
-                  <div
-                    key={index}
-                    className="flex flex-col gap-8 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] p-6 md:flex-row md:items-center md:justify-between"
-                  >
+                {trackingEvents.map(
+                  (
+                    event,
+                    index
+                  ) => (
 
-                    <div className="flex items-center gap-6">
+                    <div
+                      key={index}
+                      className="rounded-[2rem] border border-white/[0.06] bg-white/[0.02] p-8"
+                    >
 
-                      {/* IMAGE */}
-                      <div className="h-28 w-28 overflow-hidden rounded-[1.5rem] border border-white/[0.06] bg-white/[0.03]">
+                      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
 
-                        {item.image ? (
+                        <div>
 
-                          <img
-                            src={
-                              item.image
-                            }
-                            alt={
-                              item.name
-                            }
-                            className="h-full w-full object-cover"
-                          />
+                          <div className="flex items-center gap-3">
 
-                        ) : (
+                            <CheckCircle2 className="h-5 w-5 text-[#B89B72]" />
 
-                          <div className="flex h-full items-center justify-center text-white/20">
+                            <h3 className="text-xl font-light text-white">
 
-                            No Image
+                              {event.activity ||
+                                "Shipment Update"}
+
+                            </h3>
 
                           </div>
 
-                        )}
+                          <div className="mt-5 flex flex-col gap-3 text-white/50">
 
-                      </div>
+                            <div className="flex items-center gap-3">
 
-                      {/* INFO */}
-                      <div>
+                              <MapPin className="h-4 w-4" />
 
-                        <h3 className="text-2xl font-light tracking-[-0.04em] text-white">
+                              <span>
 
-                          {item.name ||
-                            item.title ||
-                            "Luxury Product"}
+                                {event.location ||
+                                  "Location unavailable"}
 
-                        </h3>
+                              </span>
 
-                        <p className="mt-3 text-sm uppercase tracking-[0.25em] text-white/35">
+                            </div>
 
-                          Quantity:
-                          {" "}
-                          {
-                            item.quantity ||
-                            1
-                          }
+                            <div className="flex items-center gap-3">
 
-                        </p>
+                              <Truck className="h-4 w-4" />
+
+                              <span className="uppercase">
+
+                                {event.status ||
+                                  "In Transit"}
+
+                              </span>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                        <div className="flex items-center gap-3 text-sm text-white/40">
+
+                          <Clock3 className="h-4 w-4" />
+
+                          <span>
+
+                            {event.date ||
+                              "Recently Updated"}
+
+                          </span>
+
+                        </div>
 
                       </div>
 
                     </div>
 
-                    {/* PRICE */}
-                    <div className="text-right">
-
-                      <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
-
-                        Subtotal
-
-                      </p>
-
-                      <p className="mt-4 text-3xl font-light">
-
-                        Rs.
-                        {Number(
-                          (
-                            item.price ||
-                            0
-                          ) *
-                            (
-                              item.quantity ||
-                              1
-                            )
-                        ).toLocaleString(
-                          "en-IN"
-                        )}
-
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                )
-              )}
-
-            </div>
-
-          </div>
-
-          {/* CUSTOMER DETAILS */}
-          <div className="mt-20 grid gap-8 md:grid-cols-2">
-
-            <InfoCard
-              label="Customer"
-              value={
-                order.customer_name ||
-                "Luxury Client"
-              }
-            />
-
-            <InfoCard
-              label="Email"
-              value={
-                order.email ||
-                "-"
-              }
-            />
-
-            <InfoCard
-              label="Phone"
-              value={
-                order.phone ||
-                "-"
-              }
-            />
-
-            <InfoCard
-              label="Total"
-              value={`Rs. ${Number(order.total).toLocaleString("en-IN")}`}
-            />
-
-          </div>
-
-          {/* SHIPPING */}
-          <div className="mt-8 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] p-8">
-
-            <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-
-              <div>
-
-                <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
-
-                  Shipping Address
-
-                </p>
-
-                <p className="mt-5 max-w-2xl text-lg leading-8 text-white/70">
-
-                  {
-                    order.address ||
-                    "No address found."
-                  }
-
-                </p>
-
-              </div>
-
-              <div>
-
-                <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">
-
-                  Estimated Delivery
-
-                </p>
-
-                <p className="mt-5 text-lg text-white">
-
-                  3-5 Business Days
-
-                </p>
+                  )
+                )}
 
               </div>
 
             </div>
 
-          </div>
+          )}
 
         </div>
 
@@ -624,7 +592,7 @@ function InfoCard({
 
       </p>
 
-      <p className="mt-5 text-xl text-white">
+      <p className="mt-5 text-xl break-all text-white">
 
         {value}
 

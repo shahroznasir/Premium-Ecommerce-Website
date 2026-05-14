@@ -120,6 +120,9 @@ export async function POST(
           "_"
         );
 
+    const trackingEvents =
+      body?.scans || [];
+
     /* =====================================================
        TEST WEBHOOK
     ====================================================== */
@@ -200,6 +203,9 @@ export async function POST(
           "out_for_delivery"
             ? "shipped"
             : trackingStatus,
+
+        tracking_events:
+          trackingEvents,
       })
       .match(
         awb

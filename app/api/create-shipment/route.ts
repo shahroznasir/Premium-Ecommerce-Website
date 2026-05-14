@@ -195,30 +195,82 @@ export async function POST(
       await shipmentResponse.json();
 
     console.log(
+      "SHIPMENT RESPONSE:",
       shipmentData
     );
 
     /* =====================================================
-       SAVE SHIPMENT DATA
+       VALIDATE SHIPMENT
+    ====================================================== */
+
+    if (
+      !shipmentResponse.ok
+    ) {
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            shipmentData?.message ||
+            "Failed to create shipment",
+          shipmentData,
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    /* =====================================================
+       EXTRACT SHIPMENT DATA
     ====================================================== */
 
     const shipmentId =
       shipmentData
-        ?.shipment_id;
+        ?.shipment_id ||
+      shipmentData
+        ?.shipment_response
+        ?.shipment_id ||
+      null;
 
     const awbCode =
       shipmentData
-        ?.awb_code || "";
+        ?.awb_code ||
+      shipmentData
+        ?.shipment_response
+        ?.awb_code ||
+      "";
 
     const courierName =
       shipmentData
+        ?.courier_name ||
+      shipmentData
+        ?.shipment_response
         ?.courier_name ||
       "";
 
     const trackingUrl =
       shipmentData
         ?.tracking_url ||
+      shipmentData
+        ?.tracking_data
+        ?.track_url ||
+      shipmentData
+        ?.shipment_response
+        ?.tracking_url ||
       "";
+
+    const estimatedDelivery =
+      shipmentData
+        ?.etd ||
+      shipmentData
+        ?.shipment_response
+        ?.etd ||
+      "";
+
+    /* =====================================================
+       SAVE SHIPMENT DATA
+    ====================================================== */
 
     await supabase
       .from("orders")
@@ -234,6 +286,15 @@ export async function POST(
 
         tracking_url:
           trackingUrl,
+
+        estimated_delivery:
+          estimatedDelivery,
+
+        tracking_status:
+          "packed",
+
+        fulfillment_status:
+          "packed",
       })
       .eq(
         "id",
@@ -246,12 +307,18 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
+      shipmentId,
+      awbCode,
+      courierName,
+      trackingUrl,
+      estimatedDelivery,
       shipmentData,
     });
 
   } catch (error) {
 
     console.error(
+      "CREATE SHIPMENT ERROR:",
       error
     );
 
