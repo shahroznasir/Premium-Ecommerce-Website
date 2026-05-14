@@ -16,6 +16,20 @@ const supabase =
   );
 
 /* =========================================================
+   GET
+   REQUIRED FOR SHIPROCKET VALIDATION
+========================================================== */
+
+export async function GET() {
+
+  return NextResponse.json({
+    success: true,
+    message:
+      "Shiprocket webhook active",
+  });
+}
+
+/* =========================================================
    WEBHOOK
 ========================================================== */
 
@@ -57,6 +71,16 @@ export async function POST(
 
     if (
       shipmentStatus?.includes(
+        "packed"
+      )
+    ) {
+
+      trackingStatus =
+        "packed";
+    }
+
+    if (
+      shipmentStatus?.includes(
         "shipped"
       )
     ) {
@@ -91,6 +115,7 @@ export async function POST(
 
     const {
       data: order,
+      error,
     } = await supabase
       .from("orders")
       .update({
@@ -109,6 +134,14 @@ export async function POST(
       )
       .select()
       .single();
+
+    if (error) {
+
+      console.error(
+        "SUPABASE ERROR:",
+        error
+      );
+    }
 
     /* =====================================================
        SEND CUSTOMER EMAIL
