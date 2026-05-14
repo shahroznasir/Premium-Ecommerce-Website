@@ -69,7 +69,11 @@ export async function POST(
        SAFE BODY PARSE
     ====================================================== */
 
-    let body: Record<string, unknown> = {};
+    let body:
+      Record<
+        string,
+        unknown
+      > = {};
 
     try {
 
@@ -95,10 +99,21 @@ export async function POST(
     ====================================================== */
 
     const awb =
-      body?.awb as string;
+      body?.awb as
+        | string
+        | undefined;
+
+    const orderId =
+      body?.order_id as
+        | string
+        | undefined;
 
     const shipmentStatus =
-      (body?.current_status as string)
+      (
+        body?.current_status as
+          | string
+          | undefined
+      )
         ?.toLowerCase()
         ?.replaceAll(
           " ",
@@ -110,7 +125,6 @@ export async function POST(
     ====================================================== */
 
     if (
-      !awb ||
       !shipmentStatus
     ) {
 
@@ -187,9 +201,16 @@ export async function POST(
             ? "shipped"
             : trackingStatus,
       })
-      .eq(
-        "awb_code",
+      .match(
         awb
+          ? {
+              awb_code:
+                awb,
+            }
+          : {
+              id:
+                orderId,
+            }
       )
       .select()
       .single();
@@ -232,6 +253,10 @@ export async function POST(
         }
       );
     }
+
+    /* =====================================================
+       SUCCESS
+    ====================================================== */
 
     return NextResponse.json({
       success: true,
