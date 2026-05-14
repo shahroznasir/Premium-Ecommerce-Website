@@ -212,8 +212,7 @@ export async function POST(
                 orderId,
             }
       )
-      .select()
-      .single();
+      .select();
 
     if (error) {
 
@@ -227,7 +226,10 @@ export async function POST(
        SEND EMAIL
     ====================================================== */
 
-    if (order) {
+    if (
+      order &&
+      order.length > 0
+    ) {
 
       await fetch(
         `${process.env.NEXT_PUBLIC_SITE_URL}/api/send-order-update`,
@@ -241,11 +243,12 @@ export async function POST(
 
           body: JSON.stringify({
             email:
-              order.email,
+              order[0].email,
 
             orderNumber:
-              order.order_number ||
-              order.id,
+              order[0]
+                .order_number ||
+              order[0].id,
 
             trackingStatus:
               trackingStatus,
