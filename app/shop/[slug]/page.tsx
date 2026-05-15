@@ -19,9 +19,9 @@ import SpatialDepth from "@/components/common/spatial-depth";
 import { supabase } from "@/lib/supabase";
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 /* =========================================================
@@ -69,7 +69,7 @@ export default async function ProductPage({
 }: ProductPageProps) {
 
   const { slug } =
-    params;
+    await params;
 
   const product =
     await getProduct(slug);

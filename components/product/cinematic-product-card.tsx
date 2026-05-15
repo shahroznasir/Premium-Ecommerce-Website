@@ -238,7 +238,7 @@ export default function CinematicProductCard({
                 <p className="mt-3 text-[1.9rem] font-light tracking-[-0.06em] text-white">
 
                   ₹
-                  {price?.toLocaleString()}
+                  {price?.toLocaleString("en-IN")}
 
                 </p>
 
