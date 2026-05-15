@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { toast } from "sonner";
+
 const statuses = [
   "processing",
   "packed",
@@ -86,13 +88,17 @@ export default function UpdateStatusButtons({
         status
       );
 
+      toast.success(
+        `Order marked as ${status}`
+      );
+
       router.refresh();
 
     } catch (error) {
 
       console.error(error);
 
-      alert(
+      toast.error(
         "Failed to update order status."
       );
 
@@ -128,7 +134,7 @@ export default function UpdateStatusButtons({
 
         <div className="inline-flex items-center gap-3 rounded-full border border-[#B89B72]/20 bg-[#B89B72]/10 px-5 py-3">
 
-          <div className="h-2 w-2 rounded-full bg-[#B89B72]" />
+          <div className="h-2 w-2 rounded-full bg-[#B89B72] animate-pulse" />
 
           <span className="text-xs uppercase tracking-[0.3em] text-[#B89B72]">
 
@@ -162,10 +168,10 @@ export default function UpdateStatusButtons({
                     status
                   )
                 }
-                className={`rounded-full border px-6 py-4 text-xs uppercase tracking-[0.3em] transition duration-500 ${
+                className={`rounded-full border px-6 py-4 text-xs uppercase tracking-[0.3em] transition-all duration-500 ${
                   isActive
-                    ? "border-[#B89B72]/30 bg-[#B89B72]/10 text-[#B89B72]"
-                    : "border-white/[0.08] bg-white/[0.03] text-white hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10 hover:text-[#B89B72]"
+                    ? "border-[#B89B72]/30 bg-[#B89B72]/10 text-[#B89B72] shadow-[0_0_30px_rgba(184,155,114,0.12)]"
+                    : "border-white/[0.08] bg-white/[0.03] text-white hover:-translate-y-[2px] hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10 hover:text-[#B89B72]"
                 } ${
                   loading
                     ? "cursor-not-allowed opacity-60"
@@ -176,7 +182,10 @@ export default function UpdateStatusButtons({
                 {loading &&
                 isActive
                   ? "Updating..."
-                  : status}
+                  : status.replaceAll(
+                      "_",
+                      " "
+                    )}
 
               </button>
 

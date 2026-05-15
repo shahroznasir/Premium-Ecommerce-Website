@@ -12,6 +12,10 @@ import {
   Search,
 } from "lucide-react";
 
+import { motion } from "framer-motion";
+
+import LuxurySkeleton from "@/components/ui/luxury-skeleton";
+
 /* =========================================================
    TYPES
 ========================================================== */
@@ -52,6 +56,27 @@ const filters = [
 ];
 
 /* =========================================================
+   STATUS COLORS
+========================================================== */
+
+const statusStyles: Record<
+  string,
+  string
+> = {
+  processing:
+    "border-yellow-500/20 bg-yellow-500/10 text-yellow-200",
+
+  packed:
+    "border-blue-500/20 bg-blue-500/10 text-blue-200",
+
+  shipped:
+    "border-purple-500/20 bg-purple-500/10 text-purple-200",
+
+  delivered:
+    "border-emerald-500/20 bg-emerald-500/10 text-emerald-200",
+};
+
+/* =========================================================
    ORDERS TABLE
 ========================================================== */
 
@@ -70,6 +95,12 @@ export default function OrdersTable({
     activeFilter,
     setActiveFilter,
   ] = useState("all");
+
+  /* =======================================================
+     TEMP LOADING STATE
+  ======================================================== */
+
+  const loading = false;
 
   /* =======================================================
      FILTERED ORDERS
@@ -112,6 +143,7 @@ export default function OrdersTable({
           );
         }
       );
+
     }, [
       orders,
       search,
@@ -119,7 +151,7 @@ export default function OrdersTable({
     ]);
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-white/[0.06] bg-white/[0.03] backdrop-blur-3xl">
+    <div className="overflow-hidden rounded-[2.5rem] border border-white/[0.06] bg-white/[0.03] backdrop-blur-3xl">
 
       {/* ===================================================
           HEADER
@@ -150,7 +182,7 @@ export default function OrdersTable({
           </div>
 
           {/* SEARCH */}
-          <div className="flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-5 py-4">
+          <div className="flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-5 py-4 transition-all duration-500 focus-within:border-[#B89B72]/20">
 
             <Search
               size={18}
@@ -190,10 +222,10 @@ export default function OrdersTable({
                         filter
                       )
                     }
-                    className={`rounded-full border px-5 py-3 text-xs uppercase tracking-[0.3em] transition duration-500 ${
+                    className={`rounded-full border px-5 py-3 text-xs uppercase tracking-[0.3em] transition-all duration-500 ${
                       isActive
                         ? "border-[#B89B72]/30 bg-[#B89B72]/10 text-[#B89B72]"
-                        : "border-white/[0.08] bg-white/[0.03] text-white hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10 hover:text-[#B89B72]"
+                        : "border-white/[0.08] bg-white/[0.03] text-white hover:-translate-y-[2px] hover:border-[#B89B72]/20 hover:bg-[#B89B72]/10 hover:text-[#B89B72]"
                     }`}
                   >
 
@@ -264,179 +296,227 @@ export default function OrdersTable({
 
           <tbody>
 
-            {filteredOrders.map(
-              (order) => {
+            {loading ? (
 
-                const parsedItems: OrderItem[] =
-                  typeof order.items ===
-                  "string"
-                    ? JSON.parse(
-                        order.items
-                      )
-                    : order.items || [];
+              Array.from({
+                length: 6,
+              }).map((_, index) => (
 
-                const firstItem =
-                  parsedItems[0];
+                <tr
+                  key={index}
+                  className="border-b border-white/[0.04]"
+                >
 
-                return (
-
-                  <tr
-                    key={order.id}
-                    className="group border-b border-white/[0.04] transition duration-300 hover:bg-white/[0.02]"
+                  <td
+                    colSpan={6}
+                    className="px-6 py-6"
                   >
 
-                    {/* ORDER */}
-                    <td className="px-8 py-6">
+                    <LuxurySkeleton
+                      showImage={false}
+                      lines={2}
+                      className="rounded-[2rem]"
+                      contentClassName="px-6 py-6"
+                    />
 
-                      <div className="flex items-center gap-5">
+                  </td>
 
-                        {/* PRODUCT IMAGE */}
-                        <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+                </tr>
 
-                          {firstItem?.image && (
+              ))
 
-                            <Image
-                              src={
-                                firstItem.image
-                              }
-                              alt={
-                                firstItem.title ||
-                                "Product"
-                              }
-                              fill
-                              className="object-cover"
-                            />
+            ) : (
 
-                          )}
+              filteredOrders.map(
+                (
+                  order,
+                  index
+                ) => {
 
-                        </div>
+                  const parsedItems: OrderItem[] =
+                    typeof order.items ===
+                    "string"
+                      ? JSON.parse(
+                          order.items
+                        )
+                      : order.items || [];
 
-                        {/* ORDER INFO */}
-                        <div>
+                  const firstItem =
+                    parsedItems[0];
 
-                          <p className="text-sm tracking-[0.08em] text-white">
+                  return (
 
-                            {
-                              order.order_number
-                            }
+                    <motion.tr
+                      key={order.id}
+                      initial={{
+                        opacity: 0,
+                        y: 20,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.45,
+                        delay:
+                          index * 0.03,
+                      }}
+                      className="group border-b border-white/[0.04] transition duration-500 hover:bg-white/[0.02]"
+                    >
 
-                          </p>
+                      {/* ===================================================
+                          ORDER
+                      ==================================================== */}
+                      <td className="px-8 py-6">
 
-                          <p className="mt-2 text-xs text-white/35">
+                        <div className="flex items-center gap-5">
 
-                            {
-                              firstItem?.title ||
-                              "Luxury Product"
-                            }
+                          <div className="relative h-20 w-20 overflow-hidden rounded-[1.4rem] border border-white/[0.05] bg-white/[0.03]">
 
-                          </p>
+                            {firstItem?.image && (
 
-                          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#B89B72]/20 bg-[#B89B72]/10 px-3 py-1">
+                              <Image
+                                src={
+                                  firstItem.image
+                                }
+                                alt={
+                                  firstItem.title ||
+                                  "Product"
+                                }
+                                fill
+                                className="object-cover transition duration-700 group-hover:scale-105"
+                              />
 
-                            <span className="text-[10px] uppercase tracking-[0.25em] text-[#B89B72]">
+                            )}
+
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
+                          </div>
+
+                          <div>
+
+                            <p className="text-[10px] uppercase tracking-[0.32em] text-[#B89B72]/75">
+
+                              Order Number
+
+                            </p>
+
+                            <h3 className="mt-3 text-lg font-light tracking-[-0.03em] text-white">
 
                               {
-                                parsedItems.length
+                                order.order_number
                               }
-                              {" "}
-                              Item
-                              {parsedItems.length >
-                              1
-                                ? "s"
-                                : ""}
 
-                            </span>
+                            </h3>
+
+                            <p className="mt-2 text-xs text-white/35">
+
+                              {
+                                firstItem?.title
+                              }
+
+                            </p>
 
                           </div>
 
                         </div>
 
-                      </div>
+                      </td>
 
-                    </td>
+                      {/* ===================================================
+                          CUSTOMER
+                      ==================================================== */}
+                      <td className="px-8 py-6">
 
-                    {/* CUSTOMER */}
-                    <td className="px-8 py-6">
+                        <div>
 
-                      <div>
+                          <p className="text-base font-light text-white">
 
-                        <p className="text-sm text-white">
+                            {
+                              order.customer_name
+                            }
 
-                          {
-                            order.customer_name
-                          }
+                          </p>
+
+                          <p className="mt-2 text-sm text-white/38">
+
+                            {order.email}
+
+                          </p>
+
+                        </div>
+
+                      </td>
+
+                      {/* ===================================================
+                          TOTAL
+                      ==================================================== */}
+                      <td className="px-8 py-6">
+
+                        <p className="text-xl font-light tracking-[-0.04em] text-white">
+
+                          ₹
+                          {order.total.toLocaleString(
+                            "en-IN"
+                          )}
 
                         </p>
 
-                        <p className="mt-2 text-xs text-white/35">
+                      </td>
+
+                      {/* ===================================================
+                          STATUS
+                      ==================================================== */}
+                      <td className="px-8 py-6">
+
+                        <div
+                          className={`inline-flex rounded-full border px-5 py-3 text-[10px] uppercase tracking-[0.32em] ${
+                            statusStyles[
+                              order.fulfillment_status
+                            ] ||
+                            "border-white/[0.08] bg-white/[0.03] text-white"
+                          }`}
+                        >
 
                           {
-                            order.email
+                            order.fulfillment_status
                           }
+
+                        </div>
+
+                      </td>
+
+                      {/* ===================================================
+                          DATE
+                      ==================================================== */}
+                      <td className="px-8 py-6">
+
+                        <p className="text-sm text-white/50">
+
+                          {new Date(
+                            order.created_at
+                          ).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
 
                         </p>
 
-                      </div>
+                      </td>
 
-                    </td>
+                      {/* ===================================================
+                          ACTION
+                      ==================================================== */}
+                      <td className="px-8 py-6">
 
-                    {/* TOTAL */}
-                    <td className="px-8 py-6 text-sm text-white">
-
-                      Rs.
-                      {" "}
-                      {Number(
-                        order.total
-                      ).toLocaleString(
-                        "en-IN"
-                      )}
-
-                    </td>
-
-                    {/* STATUS */}
-                    <td className="px-8 py-6">
-
-                      <div className="inline-flex items-center gap-2 rounded-full border border-[#B89B72]/20 bg-[#B89B72]/10 px-4 py-2">
-
-                        <div className="h-2 w-2 rounded-full bg-[#B89B72]" />
-
-                        <span className="text-xs uppercase tracking-[0.25em] text-[#B89B72]">
-
-                          {
-                            order.fulfillment_status ||
-                            "processing"
-                          }
-
-                        </span>
-
-                      </div>
-
-                    </td>
-
-                    {/* DATE */}
-                    <td className="px-8 py-6 text-sm text-white/55">
-
-                      {new Date(
-                        order.created_at
-                      ).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-
-                    </td>
-
-                    {/* ACTION */}
-                    <td className="px-8 py-6">
-
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                      >
-
-                        <button className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-3 text-xs uppercase tracking-[0.25em] text-white transition duration-500 hover:border-[#B89B72]/30 hover:bg-[#B89B72]/10 hover:text-[#B89B72]">
+                        <Link
+                          href={`/admin/orders/${order.id}`}
+                          className="group/button inline-flex items-center gap-3 rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-white transition-all duration-500 hover:border-[#B89B72]/30 hover:bg-[#B89B72]/10 hover:text-[#B89B72]"
+                        >
 
                           <Eye
                             size={14}
@@ -446,18 +526,19 @@ export default function OrdersTable({
 
                           <ArrowUpRight
                             size={14}
+                            className="transition-transform duration-500 group-hover/button:translate-x-[2px] group-hover/button:-translate-y-[2px]"
                           />
 
-                        </button>
+                        </Link>
 
-                      </Link>
+                      </td>
 
-                    </td>
+                    </motion.tr>
 
-                  </tr>
+                  );
+                }
+              )
 
-                );
-              }
             )}
 
           </tbody>
@@ -469,13 +550,28 @@ export default function OrdersTable({
       {/* ===================================================
           EMPTY STATE
       ==================================================== */}
-      {filteredOrders.length === 0 && (
+      {!loading &&
+        filteredOrders.length === 0 && (
 
-        <div className="px-8 py-20 text-center">
+        <div className="px-8 py-24 text-center">
 
-          <p className="text-lg font-light text-white/60">
+          <p className="text-[10px] uppercase tracking-[0.42em] text-[#B89B72]/70">
 
-            No matching orders found.
+            No Results
+
+          </p>
+
+          <h3 className="mt-6 text-3xl font-light tracking-[-0.05em] text-white">
+
+            No Matching Orders Found
+
+          </h3>
+
+          <p className="mx-auto mt-6 max-w-md text-sm leading-8 text-white/40">
+
+            Try adjusting your search
+            terms or fulfillment filters
+            to locate the desired orders.
 
           </p>
 

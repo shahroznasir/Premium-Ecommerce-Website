@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-import Link from "next/link";
+import {
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 
 import {
   motion,
@@ -12,15 +14,19 @@ import {
 import {
   Search,
   SlidersHorizontal,
-  Heart,
   ShoppingBag,
 } from "lucide-react";
 
-import LuxuryImage from "@/components/common/luxury-image";
+import { toast } from "sonner";
 
 import RecentlyViewedCarousel from "@/components/shop/recently-viewed-carousel";
 
+import CinematicProductCard from "@/components/product/cinematic-product-card";
+
+import QuickViewModal from "@/components/shop/quick-view-modal";
+
 import { useCartStore } from "@/stores/cart-store";
+
 import { useCartUIStore } from "@/stores/cart-ui-store";
 
 interface Product {
@@ -48,23 +54,45 @@ export default function ShopClient({
   products,
 }: ShopClientProps) {
 
-  const [selectedCategory, setSelectedCategory] =
-    useState("All");
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState("All");
 
   const [search, setSearch] =
     useState("");
 
-  const [sort, setSort] =
+  const [sort] =
     useState("latest");
 
-  const [addedId, setAddedId] =
-    useState<string | null>(null);
+  const [loadingProducts] =
+    useState(false);
 
-  const { addItem, getTotalItems } =
+  /* =========================================================
+      QUICK VIEW STATE
+  ========================================================== */
+
+  const [
+    selectedProduct,
+    setSelectedProduct,
+  ] = useState<Product | null>(
+    null
+  );
+
+  const [
+    quickViewOpen,
+    setQuickViewOpen,
+  ] = useState(false);
+
+  const { getTotalItems } =
     useCartStore();
 
   const { openCart } =
     useCartUIStore();
+
+  /* =========================================================
+      FILTER PRODUCTS
+  ========================================================== */
 
   const filteredProducts =
     useMemo(() => {
@@ -73,8 +101,10 @@ export default function ShopClient({
 
       /* CATEGORY */
       if (
-        selectedCategory !== "All"
+        selectedCategory !==
+        "All"
       ) {
+
         filtered =
           filtered.filter(
             (product) =>
@@ -85,28 +115,34 @@ export default function ShopClient({
 
       /* SEARCH */
       if (search) {
+
         filtered =
-          filtered.filter((product) =>
-            product.title
-              .toLowerCase()
-              .includes(
-                search.toLowerCase()
-              )
+          filtered.filter(
+            (product) =>
+              product.title
+                .toLowerCase()
+                .includes(
+                  search.toLowerCase()
+                )
           );
       }
 
-      /* SORTING */
+      /* SORT */
       if (sort === "low") {
+
         filtered.sort(
           (a, b) =>
-            a.price - b.price
+            a.price -
+            b.price
         );
       }
 
       if (sort === "high") {
+
         filtered.sort(
           (a, b) =>
-            b.price - a.price
+            b.price -
+            a.price
         );
       }
 
@@ -120,42 +156,66 @@ export default function ShopClient({
     ]);
 
   /* =========================================================
-     ADD TO CART
+      EMPTY SEARCH FEEDBACK
   ========================================================== */
 
-  const handleAddToCart = (
+  useEffect(() => {
+
+    if (
+      search &&
+      filteredProducts.length ===
+        0
+    ) {
+
+      toast.error(
+        "No luxury objects found"
+      );
+    }
+
+  }, [
+    search,
+    filteredProducts.length,
+  ]);
+
+  /* =========================================================
+      OPEN QUICK VIEW
+  ========================================================== */
+
+  function openQuickView(
     product: Product
-  ) => {
+  ) {
 
-    addItem({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.image,
-    });
+    setSelectedProduct(
+      product
+    );
 
-    setAddedId(product.id);
-
-    openCart();
-
-    setTimeout(() => {
-      setAddedId(null);
-    }, 1600);
-  };
+    setQuickViewOpen(true);
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
+
+      {/* =========================================================
+          QUICK VIEW MODAL
+      ========================================================== */}
+      <QuickViewModal
+        product={selectedProduct}
+        open={quickViewOpen}
+        onClose={() =>
+          setQuickViewOpen(false)
+        }
+      />
 
       {/* =========================================================
           ATMOSPHERIC DEPTH
       ========================================================== */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
-        {/* Main Glow */}
         <div className="absolute left-1/2 top-[-10%] h-[900px] w-[900px] -translate-x-1/2 rounded-full bg-[#B89B72]/[0.03] blur-[160px]" />
 
-        {/* Ambient Ring */}
         <div className="absolute left-1/2 top-[5%] h-[1300px] w-[1300px] -translate-x-1/2 rounded-full border border-white/[0.025]" />
+
+        <div className="absolute bottom-[-15%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#D6C2A3]/[0.03] blur-[140px]" />
 
       </div>
 
@@ -166,14 +226,14 @@ export default function ShopClient({
 
         <div className="container-luxury py-10 md:py-14">
 
-          <div className="grid gap-10 lg:grid-cols-[280px_1fr] xl:gap-14">
+          <div className="grid gap-10 lg:grid-cols-[300px_1fr] xl:gap-16">
 
             {/* =====================================================
                 SIDEBAR
             ====================================================== */}
             <aside className="sticky top-28 hidden h-fit lg:block">
 
-              <div className="overflow-hidden rounded-[2.4rem] border border-white/[0.05] bg-[#0A0A0A]/90 backdrop-blur-md">
+              <div className="overflow-hidden rounded-[2.8rem] border border-white/[0.05] bg-[#0A0A0A]/90 backdrop-blur-2xl">
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between border-b border-white/[0.05] p-7">
@@ -206,7 +266,7 @@ export default function ShopClient({
                 {/* SEARCH */}
                 <div className="border-b border-white/[0.05] p-7">
 
-                  <div className="flex items-center gap-4 rounded-full border border-white/[0.05] bg-black/20 px-5 py-4 backdrop-blur-md">
+                  <div className="flex items-center gap-4 rounded-full border border-white/[0.05] bg-black/20 px-5 py-4 backdrop-blur-md transition-all duration-500 focus-within:border-[#B89B72]/30">
 
                     <Search
                       size={15}
@@ -241,6 +301,7 @@ export default function ShopClient({
 
                     {categories.map(
                       (category) => (
+
                         <button
                           key={category}
                           onClick={() =>
@@ -259,70 +320,11 @@ export default function ShopClient({
                           {category}
 
                         </button>
+
                       )
                     )}
 
                   </div>
-
-                </div>
-
-                {/* SORT */}
-                <div className="border-t border-white/[0.05] p-7">
-
-                  <p className="mb-5 text-[10px] uppercase tracking-[0.38em] text-[#B89B72]/70">
-
-                    Sort
-
-                  </p>
-
-                  <select
-                    value={sort}
-                    onChange={(e) =>
-                      setSort(
-                        e.target.value
-                      )
-                    }
-                    className="w-full rounded-full border border-white/[0.05] bg-black/20 px-5 py-4 text-sm text-white outline-none"
-                  >
-
-                    <option value="latest">
-
-                      Latest
-
-                    </option>
-
-                    <option value="low">
-
-                      Price: Low To High
-
-                    </option>
-
-                    <option value="high">
-
-                      Price: High To Low
-
-                    </option>
-
-                  </select>
-
-                </div>
-
-                {/* SPATIAL PHILOSOPHY */}
-                <div className="border-t border-white/[0.05] p-7">
-
-                  <p className="text-[10px] uppercase tracking-[0.45em] text-[#c9a961]">
-
-                    Spatial Philosophy
-
-                  </p>
-
-                  <p className="mt-5 text-sm leading-8 text-white/40">
-
-                    Designed for cinematic interiors,
-                    sculptural restraint, timeless
-                    architecture, and elevated living.
-
-                  </p>
 
                 </div>
 
@@ -331,7 +333,7 @@ export default function ShopClient({
             </aside>
 
             {/* =====================================================
-                PRODUCTS
+                PRODUCTS AREA
             ====================================================== */}
             <div>
 
@@ -354,236 +356,176 @@ export default function ShopClient({
 
                 </div>
 
-                {/* ACTIONS */}
-                <div className="flex items-center gap-3">
+                {/* CART */}
+                <button
+                  onClick={openCart}
+                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition-all duration-500 hover:scale-[1.03] hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white"
+                >
 
-                  {/* Wishlist */}
-                  <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white">
+                  <ShoppingBag
+                    size={15}
+                  />
 
-                    <Heart size={15} />
+                  {getTotalItems() >
+                    0 && (
 
-                  </button>
+                    <motion.div
+                      initial={{
+                        scale: 0,
+                      }}
+                      animate={{
+                        scale: 1,
+                      }}
+                      className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[9px] font-medium text-black"
+                    >
 
-                  {/* Cart */}
-                  <button
-                    onClick={openCart}
-                    className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.02] text-white/55 transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white"
-                  >
+                      {getTotalItems()}
 
-                    <ShoppingBag
-                      size={15}
-                    />
+                    </motion.div>
 
-                    {getTotalItems() >
-                      0 && (
-                      <motion.div
-                        initial={{
-                          scale: 0,
-                        }}
-                        animate={{
-                          scale: 1,
-                        }}
-                        className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[9px] font-medium text-black"
-                      >
+                  )}
 
-                        {getTotalItems()}
-
-                      </motion.div>
-                    )}
-
-                  </button>
-
-                </div>
+                </button>
 
               </div>
 
               {/* =====================================================
                   PRODUCTS GRID
               ====================================================== */}
-              <AnimatePresence mode="wait">
+              {loadingProducts ? (
 
-                <motion.div
-                  key={`${selectedCategory}-${sort}-${search}`}
-                  initial={{
-                    opacity: 0,
-                    y: 20,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: 20,
-                  }}
-                  transition={{
-                    duration: 0.45,
-                  }}
-                  className="grid gap-8 md:grid-cols-2 2xl:grid-cols-3"
-                >
+                <div className="grid gap-8 md:grid-cols-2 2xl:grid-cols-3">
 
-                  {filteredProducts.map(
-                    (
-                      product,
-                      index
-                    ) => (
-                      <motion.div
-                        key={product.id}
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        whileInView={{
-                          opacity: 1,
-                          y: 0,
-                        }}
-                        transition={{
-                          duration: 0.8,
-                          delay:
-                            index * 0.05,
-                        }}
-                        viewport={{
-                          once: true,
-                        }}
-                        className="group relative"
-                      >
+                  {Array.from({
+                    length: 6,
+                  }).map((_, index) => (
 
-                        {/* =================================================
-                            PRODUCT CARD
-                        ================================================== */}
-                        <div className="group relative overflow-hidden rounded-[2.6rem] border border-white/[0.05] bg-[#0A0A0A]/90 backdrop-blur-md transition-all duration-700 hover:-translate-y-2 hover:border-[#B89B72]/20">
+                    <CinematicProductCard
+                      key={index}
+                      loading
+                    />
 
-                          {/* IMAGE */}
-                          <div className="relative aspect-[0.72] overflow-hidden bg-[#0F0F0F]">
+                  ))}
 
-                            <LuxuryImage
-                              src={
-                                product.image
-                              }
-                              alt={
-                                product.title
-                              }
-                              className="h-full w-full object-cover transition-transform duration-[1800ms] ease-out group-hover:scale-[1.03]"
-                            />
+                </div>
 
-                            {/* OVERLAYS */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+              ) : filteredProducts.length ===
+                0 ? (
 
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,169,97,0.12),transparent_40%)]" />
+                <div className="flex min-h-[480px] flex-col items-center justify-center rounded-[2.8rem] border border-white/[0.05] bg-white/[0.02] px-8 text-center backdrop-blur-xl">
 
-                            <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.45)]" />
+                  <p className="text-[10px] uppercase tracking-[0.45em] text-[#B89B72]/70">
 
-                          </div>
+                    No Results
 
-                          {/* CONTENT */}
-                          <div className="px-8 pb-8 pt-7">
+                  </p>
 
-                            {/* CATEGORY */}
-                            <p className="text-[10px] uppercase tracking-[0.4em] text-[#c9a961]/78">
+                  <h2 className="mt-6 text-4xl font-light tracking-[-0.06em] text-white">
 
-                              {
-                                product.category
-                              }
+                    No Luxury Objects Found
 
-                            </p>
+                  </h2>
 
-                            {/* TITLE */}
-                            <Link
-                              href={`/shop/${product.slug}`}
-                            >
+                  <p className="mt-6 max-w-md text-sm leading-8 text-white/40">
 
-                              <h2 className="mt-5 max-w-[11ch] font-serif text-[2.2rem] leading-[0.92] tracking-[-0.06em] text-white transition-all duration-500 hover:text-[#D6C2A3]">
+                    Try refining your search,
+                    category, or collection
+                    preferences.
 
-                                {
-                                  product.title
-                                }
+                  </p>
 
-                              </h2>
+                </div>
 
-                            </Link>
+              ) : (
 
-                            {/* DESCRIPTION */}
-                            <p className="mt-5 max-w-[30ch] text-[0.95rem] leading-[1.95] text-white/42">
+                <AnimatePresence mode="wait">
 
-                              Sculptural luxury object
-                              designed through architectural
-                              restraint, timeless materiality,
-                              and refined modern living.
+                  <motion.div
+                    key={`${selectedCategory}-${search}`}
+                    initial={{
+                      opacity: 0,
+                    }}
+                    animate={{
+                      opacity: 1,
+                    }}
+                    exit={{
+                      opacity: 0,
+                    }}
+                    transition={{
+                      duration: 0.45,
+                    }}
+                    className="grid gap-8 md:grid-cols-2 2xl:grid-cols-3"
+                  >
 
-                            </p>
+                    {filteredProducts.map(
+                      (
+                        product,
+                        index
+                      ) => (
 
-                            {/* BOTTOM */}
-                            <div className="mt-10 flex items-center justify-between gap-5">
+                        <motion.div
+                          key={product.id}
+                          initial={{
+                            opacity: 0,
+                            y: 40,
+                          }}
+                          whileInView={{
+                            opacity: 1,
+                            y: 0,
+                          }}
+                          transition={{
+                            duration: 0.7,
+                            delay:
+                              index * 0.05,
+                          }}
+                          viewport={{
+                            once: true,
+                          }}
+                          className="group relative"
+                        >
 
-                              {/* PRICE */}
-                              <div>
+                          {/* QUICK VIEW BUTTON */}
+                          <button
+                            onClick={() =>
+                              openQuickView(
+                                product
+                              )
+                            }
+                            className="absolute right-5 top-5 z-20 rounded-full border border-white/[0.08] bg-black/50 px-5 py-3 text-[10px] uppercase tracking-[0.34em] text-white opacity-0 backdrop-blur-xl transition-all duration-500 hover:border-[#B89B72]/30 hover:bg-[#B89B72]/10 hover:text-[#D6C2A3] group-hover:opacity-100"
+                          >
 
-                                <p className="text-[9px] uppercase tracking-[0.34em] text-white/28">
+                            Quick View
 
-                                  Curated Piece
+                          </button>
 
-                                </p>
+                          <CinematicProductCard
+                            slug={
+                              product.slug
+                            }
+                            name={
+                              product.title
+                            }
+                            price={
+                              product.price
+                            }
+                            image={
+                              product.image
+                            }
+                            category={
+                              product.category
+                            }
+                          />
 
-                                <p className="mt-3 text-[1.7rem] font-light tracking-[-0.05em] text-white">
+                        </motion.div>
 
-                                  ₹
-                                  {product.price.toLocaleString(
-                                    "en-IN"
-                                  )}
+                      )
+                    )}
 
-                                </p>
+                  </motion.div>
 
-                              </div>
+                </AnimatePresence>
 
-                              {/* ACTIONS */}
-                              <div className="flex items-center gap-3">
-
-                                {/* Wishlist */}
-                                <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.02] text-white/55 transition-all duration-500 hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white">
-
-                                  <Heart
-                                    size={15}
-                                  />
-
-                                </button>
-
-                                {/* Add */}
-                                <button
-                                  onClick={() =>
-                                    handleAddToCart(
-                                      product
-                                    )
-                                  }
-                                  className={`rounded-full px-6 py-3 text-[10px] uppercase tracking-[0.34em] transition-all duration-500 ${
-                                    addedId ===
-                                    product.id
-                                      ? "bg-white text-black"
-                                      : "border border-white/[0.08] bg-white text-black hover:scale-[1.02]"
-                                  }`}
-                                >
-
-                                  {addedId ===
-                                  product.id
-                                    ? "Added"
-                                    : "Add"}
-
-                                </button>
-
-                              </div>
-
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                      </motion.div>
-                    )
-                  )}
-
-                </motion.div>
-
-              </AnimatePresence>
+              )}
 
             </div>
 

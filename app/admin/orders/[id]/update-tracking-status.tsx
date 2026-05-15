@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { createClient } from "@supabase/supabase-js";
 
+import { toast } from "sonner";
+
 /* =========================================================
    SUPABASE
 ========================================================== */
@@ -65,7 +67,9 @@ export default function UpdateTrackingStatus({
          UPDATE TRACKING STATUS
       ==================================================== */
 
-      await supabase
+      const {
+        error,
+      } = await supabase
         .from("orders")
         .update({
           tracking_status:
@@ -86,6 +90,11 @@ export default function UpdateTrackingStatus({
           orderId
         );
 
+      if (error) {
+
+        throw error;
+      }
+
       /* ===================================================
          CREATE SHIPMENT AUTOMATICALLY
       ==================================================== */
@@ -95,21 +104,41 @@ export default function UpdateTrackingStatus({
         "shipped"
       ) {
 
-        await fetch(
-          "/api/create-shipment",
-          {
-            method: "POST",
+        const shipmentResponse =
+          await fetch(
+            "/api/create-shipment",
+            {
+              method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-            body: JSON.stringify({
-              orderId,
-            }),
-          }
-        );
+              body: JSON.stringify({
+                orderId,
+              }),
+            }
+          );
+
+        const shipmentData =
+          await shipmentResponse.json();
+
+        if (
+          !shipmentResponse.ok
+        ) {
+
+          toast.error(
+            shipmentData?.message ||
+              "Shipment creation failed"
+          );
+
+        } else {
+
+          toast.success(
+            "Luxury shipment created successfully"
+          );
+        }
       }
 
       /* ===================================================
@@ -139,13 +168,24 @@ export default function UpdateTrackingStatus({
         }
       );
 
+      /* ===================================================
+         SUCCESS TOAST
+      ==================================================== */
+
+      toast.success(
+        `Order marked as ${status.replaceAll(
+          "_",
+          " "
+        )}`
+      );
+
     } catch (error) {
 
       console.error(
         error
       );
 
-      alert(
+      toast.error(
         "Failed to update logistics status."
       );
 
@@ -174,11 +214,11 @@ export default function UpdateTrackingStatus({
               status
             )
           }
-          className={`rounded-full px-6 py-4 text-xs uppercase tracking-[0.3em] transition duration-500 ${
+          className={`rounded-full px-6 py-4 text-xs uppercase tracking-[0.3em] transition-all duration-500 ${
             activeStatus ===
             status
-              ? "bg-[#B89B72] text-black"
-              : "border border-white/[0.06] bg-white/[0.03] text-white/60 hover:border-[#B89B72]/20 hover:text-white"
+              ? "bg-[#B89B72] text-black shadow-[0_0_40px_rgba(184,155,114,0.25)]"
+              : "border border-white/[0.06] bg-white/[0.03] text-white/60 hover:-translate-y-[2px] hover:border-[#B89B72]/20 hover:bg-white/[0.05] hover:text-white"
           } ${
             loading
               ? "cursor-not-allowed opacity-60"

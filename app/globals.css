@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+
   /* =========================================
      CORE PALETTE
   ========================================= */
@@ -82,7 +83,13 @@ html {
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(184,155,114,0.05),
+      transparent 30%
+    ),
+    var(--background);
 
   color: var(--foreground);
 
@@ -106,6 +113,11 @@ body {
   box-sizing: border-box;
 
   -webkit-tap-highlight-color: transparent;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 /* =========================================
@@ -252,27 +264,23 @@ p {
 ========================================= */
 
 .section-spacing-xl {
-  padding-block: var(
-    --section-spacing-xl
-  );
+  padding-block:
+    var(--section-spacing-xl);
 }
 
 .section-spacing-lg {
-  padding-block: var(
-    --section-spacing-lg
-  );
+  padding-block:
+    var(--section-spacing-lg);
 }
 
 .section-spacing-md {
-  padding-block: var(
-    --section-spacing-md
-  );
+  padding-block:
+    var(--section-spacing-md);
 }
 
 .section-spacing-sm {
-  padding-block: var(
-    --section-spacing-sm
-  );
+  padding-block:
+    var(--section-spacing-sm);
 }
 
 /* =========================================
@@ -296,7 +304,7 @@ p {
 .glass-luxury {
   background: rgba(255,255,255,0.03);
 
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
 
   border: 1px solid rgba(255,255,255,0.06);
 
@@ -317,6 +325,8 @@ p {
 
 .border-luxury {
   border: 1px solid rgba(255,255,255,0.06);
+
+  border-radius: 1rem;
 }
 
 /* =========================================
@@ -346,6 +356,22 @@ p {
       155,
       114,
       0.08
+    );
+}
+
+.shadow-luxury {
+  box-shadow:
+    0 0 60px rgba(
+      184,
+      155,
+      114,
+      0.1
+    ),
+    0 0 120px rgba(
+      184,
+      155,
+      114,
+      0.05
     );
 }
 
@@ -400,6 +426,26 @@ button {
       var(--transition-luxury);
 }
 
+.btn-luxury {
+  border-radius: 999px;
+
+  transition:
+    all 0.3s ease;
+}
+
+.btn-luxury:hover {
+  box-shadow:
+    0 0 40px rgba(
+      184,
+      155,
+      114,
+      0.2
+    );
+
+  transform:
+    translateY(-2px);
+}
+
 /* =========================================
    LINK SYSTEM
 ========================================= */
@@ -412,12 +458,157 @@ a {
       var(--transition-luxury);
 }
 
+a:hover {
+  text-decoration: none;
+
+  color: #B89B72;
+}
+
 /* =========================================
    TEXT UTILITIES
 ========================================= */
 
 .text-balance {
   text-wrap: balance;
+}
+
+/* =========================================
+   GLOBAL SHIMMER SYSTEM
+========================================= */
+
+.bg-skeleton {
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0%,
+      rgba(255,255,255,0.06) 50%,
+      rgba(255,255,255,0.03) 100%
+    );
+
+  background-size: 200% 100%;
+}
+
+.animate-shimmer {
+  animation:
+    shimmer 2.6s linear infinite;
+}
+
+@keyframes shimmer {
+
+  0% {
+    transform:
+      translateX(-100%);
+  }
+
+  100% {
+    transform:
+      translateX(100%);
+  }
+}
+
+/* =========================================
+   FADE ANIMATIONS
+========================================= */
+
+.fade-in {
+  opacity: 0;
+
+  animation:
+    fadeInAnim 0.7s forwards;
+
+  animation-timing-function:
+    ease-in-out;
+}
+
+@keyframes fadeInAnim {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateY(12px);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================================
+   FLOAT ANIMATION
+========================================= */
+
+.float-slow {
+  animation:
+    floatSlow 8s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+
+  0%,
+  100% {
+    transform:
+      translateY(0px);
+  }
+
+  50% {
+    transform:
+      translateY(-10px);
+  }
+}
+
+/* =========================================
+   LUXURY GRID OVERLAY
+========================================= */
+
+.grid-luxury {
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.02) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.02) 1px,
+      transparent 1px
+    );
+
+  background-size:
+    40px 40px;
+}
+
+/* =========================================
+   LOADING OVERLAY
+========================================= */
+
+.loading-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(5, 5, 5, 0.82);
+
+  backdrop-filter:
+    blur(8px);
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  z-index: 9999;
+
+  animation:
+    fadeInAnim 0.4s forwards;
 }
 
 /* =========================================
@@ -432,6 +623,27 @@ a {
   -ms-overflow-style: none;
 
   scrollbar-width: none;
+}
+
+/* =========================================
+   NOISE TEXTURE
+========================================= */
+
+.noise-overlay::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.035;
+
+  mix-blend-mode: soft-light;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='white' fill-opacity='0.08'%3E%3Ccircle cx='4' cy='4' r='1'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* =========================================
@@ -456,5 +668,9 @@ a {
   .glass-luxury,
   .glass-luxury-soft {
     backdrop-filter: blur(10px);
+  }
+
+  .text-hero-luxury {
+    letter-spacing: -0.06em;
   }
 }

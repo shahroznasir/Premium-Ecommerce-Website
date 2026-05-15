@@ -13,6 +13,10 @@ import RevenueChart from "@/components/admin/revenue-chart";
 
 import OrdersTable from "@/components/admin/orders-table";
 
+import FulfillmentFunnel from "@/components/admin/fulfillment-funnel";
+
+import LiveActivityFeed from "@/components/admin/live-activity-feed";
+
 /* =========================================================
    SUPABASE
 ========================================================== */
@@ -79,6 +83,27 @@ export default async function AdminPage() {
       (order) =>
         order.fulfillment_status ===
         "delivered"
+    ).length || 0;
+
+  const processingOrders =
+    orders?.filter(
+      (order) =>
+        order.fulfillment_status ===
+        "processing"
+    ).length || 0;
+
+  const packedOrders =
+    orders?.filter(
+      (order) =>
+        order.fulfillment_status ===
+        "packed"
+    ).length || 0;
+
+  const shippedOrders =
+    orders?.filter(
+      (order) =>
+        order.fulfillment_status ===
+        "shipped"
     ).length || 0;
 
   const deliveredPercentage =
@@ -387,6 +412,24 @@ export default async function AdminPage() {
             </div>
 
           </div>
+
+        </div>
+
+        {/* =================================================
+            OPERATIONS INTELLIGENCE
+        ================================================== */}
+        <div className="mt-16 grid gap-6 lg:grid-cols-2">
+
+          <FulfillmentFunnel
+            processing={processingOrders}
+            packed={packedOrders}
+            shipped={shippedOrders}
+            delivered={deliveredOrders}
+          />
+
+          <LiveActivityFeed
+            orders={orders || []}
+          />
 
         </div>
 
